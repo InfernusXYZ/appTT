@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">appTT</string>
+
+    <!-- Opciones para Categoría de Ingresos -->
+    <string-array name="opciones_categoria_ingresos">
+        <item>Sueldo</item>
+        <item>Inversiones</item>
+        <item>Regalos</item>
+        <item>Otros ingresos</item>
+    </string-array>
+
+    <!-- Opciones para Tipo de Ingresos -->
+    <string-array name="opciones_tipo_ingresos">
+        <item>Fijo</item>
+        <item>Variable</item>
+    </string-array>
+
+    <!-- Opciones para Categoría de Gastos -->
+    <string-array name="opciones_categoria_gastos">
+        <item>Alquiler</item>
+        <item>Comida</item>
+        <item>Transporte</item>
+        <item>Entretenimiento</item>
+    </string-array>
+
+    <!-- Opciones para Tipo de Gastos -->
+    <string-array name="opciones_tipo_gastos">
+        <item>Fijo</item>
+        <item>Variable</item>
+    </string-array>
+
+</resources>
