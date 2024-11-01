@@ -249,7 +249,19 @@
                 android:backgroundTint="@color/secondary"
                 android:textColor="#FFFFFF"
                 android:layout_marginBottom="24dp"/>
+            <Button
+                android:id="@+id/btnreggas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Guardar Gasto"
+                android:layout_marginBottom="24dp"/>
 
+            <Button
+                android:id="@+id/btnHG"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Historial Gastos"
+                />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
