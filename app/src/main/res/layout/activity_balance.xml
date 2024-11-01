@@ -86,8 +86,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:text="Aquí podrás escribir el texto de la descripción..."
-                android:textSize="16sp" />
+                android:text="Durante este módulo se podrán ingresar los datos de los ingresos y los gastos que una persona cree o piensa tener durante un periodo de tiempo. Los datos se podrán visualizar mediante gráficos, un balance mensual al final y un historial con los datos ingresados."
+                android:textSize="16sp"
+                android:justificationMode="inter_word"/>
 
             <!-- Sección de Ingresos -->
             <TextView
@@ -323,7 +324,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
-                android:background="#9038CE56"
+                android:background="#E3F2FD"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:layout_gravity="left"
@@ -342,7 +343,7 @@
                     android:text="0.00"
                     android:textSize="15sp"
                     android:textColor="#000000"
-                    android:background="#C0BA3A3A"
+                    android:background="#E8F5E9"
                     android:textStyle="bold"
                     android:layout_marginBottom="24dp"/>
 

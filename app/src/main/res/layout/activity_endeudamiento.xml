@@ -86,8 +86,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:text="Aquí podrás escribir el texto de la descripción..."
-                android:textSize="16sp" />
+                android:text="Durante este módulo, podrás realizar el cálculo de la relación de endeudamiento con un tipo de deuda, así como visualizar de manera gráfica la distribución porcentual de la misma y el historial con los datos ingresados."
+                android:textSize="16sp"
+                android:justificationMode="inter_word"/>
 
             <!-- Campo para Tipo de Deuda -->
             <TextView
@@ -200,7 +201,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
-                android:background="#BF2F4FAF"
+                android:background="#E3F2FD"
                 android:textSize="10sp"
                 android:layout_marginBottom="24dp"/>
                 <TextView
@@ -209,7 +210,7 @@
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
-                    android:background="#BF2F4FAF"
+                    android:background="#FFFDE7"
                     android:textSize="10sp"
                     android:layout_marginBottom="24dp"/>
                 <TextView
@@ -218,7 +219,7 @@
                     android:layout_height="wrap_content"
                     android:padding="16dp"
                     android:layout_weight="1"
-                    android:background="#BF2F4FAF"
+                    android:background="#E8F5E9"
                     android:textSize="10sp"
                     android:layout_marginBottom="24dp"/>
                 <TextView
@@ -227,7 +228,7 @@
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
-                    android:background="#BF2F4FAF"
+                    android:background="#F3E5F5"
                     android:textSize="10sp"
                     android:layout_marginBottom="24dp"/>
             </LinearLayout>
