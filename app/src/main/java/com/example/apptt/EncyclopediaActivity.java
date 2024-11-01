@@ -133,9 +133,6 @@ public class EncyclopediaActivity extends AppCompatActivity {
         ImageView imageConcept = findViewById(imageId);
         final TextView tvConceptDescription = findViewById(descriptionId);
 
-        // Inicializar la descripción con un texto largo, pero solo se muestran 2 líneas al inicio
-        tvConceptDescription.setText("Esta es una descripción completa del Concepto " + (index + 1) + ". Antes de expandir solo se mostrará una parte del texto...");
-
         // Manejar el clic en la imagen para expandir o colapsar la descripción
         imageConcept.setOnClickListener(new View.OnClickListener() {
             @Override

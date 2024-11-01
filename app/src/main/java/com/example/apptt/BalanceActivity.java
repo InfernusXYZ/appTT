@@ -74,7 +74,7 @@ public class BalanceActivity extends AppCompatActivity {
         textViewTitle.setText(spannableString);
 
         final TextView tvDescripcion1 = findViewById(R.id.tv_descripcion1);
-        tvDescripcion1.setText("Aquí podrás escribir el texto de la descripción...");
+        tvDescripcion1.setText("Durante este módulo se podrán ingresar los datos de los ingresos y los gastos que una persona cree o piensa tener durante un periodo de tiempo. Los datos se podrán visualizar mediante gráficos, un balance mensual al final y un historial con los datos ingresados.");
 
         // Inicializar SharedPreferences
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);

@@ -109,13 +109,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/example_image"
+                    android:src="@drawable/presupuesto"
                     android:contentDescription="Imagen del concepto 1" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Concepto 1"
+                    android:text="Presupuesto"
                     android:textSize="18sp"
                     android:layout_marginTop="8dp"/>
 
@@ -123,11 +123,12 @@
                     android:id="@+id/tv_concept_description1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Esta es una descripción corta..."
+                    android:text="Es un plan financiero que estima los ingresos y gastos para un periodo determinado. Ayuda a las personas y organizaciones a gestionar sus finanzas, asegurando que los gastos no superen los ingresos."
                     android:textSize="14sp"
                     android:maxLines="2"
                     android:ellipsize="end"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="4dp"
+                    android:justificationMode="inter_word"/>
             </LinearLayout>
 
             <LinearLayout
@@ -145,13 +146,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/example_image"
+                    android:src="@drawable/ahorro"
                     android:contentDescription="Imagen del concepto 2" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Concepto 2"
+                    android:text="Ahorro"
                     android:textSize="18sp"
                     android:layout_marginTop="8dp"/>
 
@@ -159,11 +160,12 @@
                     android:id="@+id/tv_concept_description2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Esta es una descripción corta..."
+                    android:text="Es la parte de los ingresos que no se gasta y se reserva para futuros gastos o inversiones. El ahorro es fundamental para construir un fondo de emergencia y alcanzar metas financieras a largo plazo."
                     android:textSize="14sp"
                     android:maxLines="2"
                     android:ellipsize="end"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="4dp"
+                    android:justificationMode="inter_word"/>
             </LinearLayout>
 
             <LinearLayout
@@ -181,13 +183,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/example_image"
+                    android:src="@drawable/intereses"
                     android:contentDescription="Imagen del concepto 3" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Concepto 3"
+                    android:text="Intereses"
                     android:textSize="18sp"
                     android:layout_marginTop="8dp"/>
 
@@ -195,11 +197,12 @@
                     android:id="@+id/tv_concept_description3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Esta es una descripción corta..."
+                    android:text="Es el costo del dinero prestado o el rendimiento de una inversión, expresado como un porcentaje. Los intereses pueden ser simples o compuestos, y afectan directamente el costo de las deudas y el rendimiento de los ahorros."
                     android:textSize="14sp"
                     android:maxLines="2"
                     android:ellipsize="end"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="4dp"
+                    android:justificationMode="inter_word"/>
             </LinearLayout>
 
             <LinearLayout
@@ -217,13 +220,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/example_image"
+                    android:src="@drawable/flujoefectivo"
                     android:contentDescription="Imagen del concepto 4" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Concepto 4"
+                    android:text="Flujo de efectivo"
                     android:textSize="18sp"
                     android:layout_marginTop="8dp"/>
 
@@ -231,11 +234,12 @@
                     android:id="@+id/tv_concept_description4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Esta es una descripción corta..."
+                    android:text="Es la diferencia entre los ingresos y los gastos en un periodo específico, reflejando la liquidez de una persona o empresa. Un flujo de efectivo positivo indica que se están generando más ingresos de los que se gastan, lo cual es crucial para la salud financiera."
                     android:textSize="14sp"
                     android:maxLines="2"
                     android:ellipsize="end"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="4dp"
+                    android:justificationMode="inter_word"/>
             </LinearLayout>
 
             <LinearLayout
@@ -253,13 +257,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/example_image"
+                    android:src="@drawable/capital"
                     android:contentDescription="Imagen del concepto 5" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Concepto 5"
+                    android:text="Capital"
                     android:textSize="18sp"
                     android:layout_marginTop="8dp"/>
 
@@ -267,11 +271,12 @@
                     android:id="@+id/tv_concept_description5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Esta es una descripción corta..."
+                    android:text="Es el dinero o los activos que se utilizan para generar ingresos o realizar inversiones. Tener suficiente capital es esencial para el crecimiento de un negocio y la realización de proyectos."
                     android:textSize="14sp"
                     android:maxLines="2"
                     android:ellipsize="end"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="4dp"
+                    android:justificationMode="inter_word"/>
             </LinearLayout>
 
             <LinearLayout
@@ -289,13 +294,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/example_image"
+                    android:src="@drawable/costovida"
                     android:contentDescription="Imagen del concepto 6" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Concepto 6"
+                    android:text="Costo de Vida"
                     android:textSize="18sp"
                     android:layout_marginTop="8dp"/>
 
@@ -303,11 +308,12 @@
                     android:id="@+id/tv_concept_description6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Esta es una descripción corta..."
+                    android:text="Es la cantidad de dinero necesaria para mantener un nivel de vida específico, incluyendo gastos en vivienda, alimentación, transporte y otros servicios. Conocer el costo de vida es vital para ajustar los ingresos y gastos, especialmente al mudarse a una nueva ciudad o país."
                     android:textSize="14sp"
                     android:maxLines="2"
                     android:ellipsize="end"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="4dp"
+                    android:justificationMode="inter_word"/>
             </LinearLayout>
 
             <LinearLayout
@@ -325,13 +331,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/example_image"
+                    android:src="@drawable/deuda"
                     android:contentDescription="Imagen del concepto 7" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Concepto 7"
+                    android:text="Deuda Consolidada"
                     android:textSize="18sp"
                     android:layout_marginTop="8dp"/>
 
@@ -339,11 +345,12 @@
                     android:id="@+id/tv_concept_description7"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Esta es una descripción corta..."
+                    android:text="Es la combinación de varias deudas en un solo préstamo con el objetivo de simplificar los pagos y, a menudo, reducir la tasa de interés. Puede ayudar a gestionar mejor las deudas y disminuir la carga mensual al unificar los pagos."
                     android:textSize="14sp"
                     android:maxLines="2"
                     android:ellipsize="end"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="4dp"
+                    android:justificationMode="inter_word"/>
             </LinearLayout>
 
             <LinearLayout
@@ -361,13 +368,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/example_image"
+                    android:src="@drawable/credito"
                     android:contentDescription="Imagen del concepto 8" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Concepto 8"
+                    android:text="Crédito"
                     android:textSize="18sp"
                     android:layout_marginTop="8dp"/>
 
@@ -375,11 +382,12 @@
                     android:id="@+id/tv_concept_description8"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Esta es una descripción corta..."
+                    android:text="Es la capacidad de una persona o entidad para obtener bienes o servicios antes de pagar, basándose en la confianza de que se pagará en el futuro. Un buen historial de crédito puede facilitar el acceso a préstamos con mejores condiciones y tasas de interés."
                     android:textSize="14sp"
                     android:maxLines="2"
                     android:ellipsize="end"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="4dp"
+                    android:justificationMode="inter_word"/>
             </LinearLayout>
 
             <LinearLayout
@@ -397,13 +405,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/example_image"
+                    android:src="@drawable/endeudamiento"
                     android:contentDescription="Imagen del concepto 9" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Concepto 9"
+                    android:text="Endeudamiento"
                     android:textSize="18sp"
                     android:layout_marginTop="8dp"/>
 
@@ -411,11 +419,12 @@
                     android:id="@+id/tv_concept_description9"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Esta es una descripción corta..."
+                    android:text="Es el proceso de adquirir deuda a través de préstamos, créditos o compras a plazos, en el que una persona o entidad asume la obligación de pagar una cantidad de dinero en el futuro. Un nivel adecuado de endeudamiento puede ser útil para financiar proyectos o gastos imprevistos, pero el endeudamiento excesivo puede llevar a problemas financieros, como la incapacidad para hacer frente a los pagos, lo que puede afectar el historial crediticio y la estabilidad financiera."
                     android:textSize="14sp"
                     android:maxLines="2"
                     android:ellipsize="end"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="4dp"
+                    android:justificationMode="inter_word"/>
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
