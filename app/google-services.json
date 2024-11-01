@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1002561981023",
+    "project_id": "poliwallet-bd091",
+    "storage_bucket": "poliwallet-bd091.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1002561981023:android:fd3169cb7a77de9143a9ea",
+        "android_client_info": {
+          "package_name": "com.example.apptt"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_1Jy8yEfhYuPOkb1zOEtkw9Msbr51yjw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

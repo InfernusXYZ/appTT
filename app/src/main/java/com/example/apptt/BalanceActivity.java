@@ -203,7 +203,23 @@ public class BalanceActivity extends AppCompatActivity {
                 }
             }
         });
+        Button btreging = findViewById(R.id.btnreging);
+        btreging.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(BalanceActivity.this, insertingreso.class);
+                startActivity(intent);
+            }
+        });
 
+        Button bthistorialI = findViewById(R.id.btnHi);
+        bthistorialI.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent =new Intent(BalanceActivity.this, HistorialIngreso.class);
+                startActivity(intent);
+            }
+        });
         // Inicializar Spinners para Categoría y Tipo de Gastos
         Spinner spinnerCategoriaGastos = findViewById(R.id.spinner_categoria_gastos);
         Spinner spinnerTipoGastos = findViewById(R.id.spinner_tipo_gastos);
