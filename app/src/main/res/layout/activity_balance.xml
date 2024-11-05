@@ -99,61 +99,61 @@
                 android:layout_marginBottom="8dp"/>
 
             <!-- Leyenda "Categoría" -->
-            <TextView
+            <!--<TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Categoría"
                 android:textSize="16sp"
-                android:layout_marginBottom="8dp"/>
+                android:layout_marginBottom="8dp"/>-->
 
             <!-- Spinner para Categoría de Ingresos -->
-            <Spinner
+            <!--<Spinner
                 android:id="@+id/spinner_categoria"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="16dp"/>-->
 
             <!-- Leyenda "Tipo" -->
-            <TextView
+            <!--<TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tipo"
                 android:textSize="16sp"
-                android:layout_marginBottom="8dp"/>
+                android:layout_marginBottom="8dp"/>-->
 
             <!-- Spinner para Tipo de Ingresos -->
-            <Spinner
+            <!--<Spinner
                 android:id="@+id/spinner_tipo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="16dp"/>-->
 
             <!-- Leyenda "Monto" -->
-            <TextView
+            <!--<TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Monto"
                 android:textSize="16sp"
-                android:layout_marginBottom="8dp"/>
+                android:layout_marginBottom="8dp"/>-->
 
             <!-- Campo de texto para ingresar monto de Ingresos -->
-            <EditText
+            <!--<EditText
                 android:id="@+id/et_monto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="numberDecimal"
                 android:hint="Ingrese un monto"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="16dp"/>-->
 
             <!-- Botón para guardar el monto de Ingresos -->
-            <Button
+            <!--<Button
                 android:id="@+id/btn_guardar_monto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Guardar Monto"
                 android:backgroundTint="@color/secondary"
                 android:textColor="#FFFFFF"
-                android:layout_marginBottom="24dp"/>
+                android:layout_marginBottom="24dp"/>-->
 
             <Button
                 android:id="@+id/btnreging"
@@ -187,7 +187,7 @@
                 android:layout_marginBottom="16dp" />
 
             <!-- Sección de Gastos -->
-            <TextView
+           <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Gastos"
@@ -195,61 +195,60 @@
                 android:layout_marginBottom="8dp"/>
 
             <!-- Leyenda "Categoría" -->
-            <TextView
+            <!--<TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Categoría"
                 android:textSize="16sp"
-                android:layout_marginBottom="8dp"/>
+                android:layout_marginBottom="8dp"/>-->
 
             <!-- Spinner para Categoría de Gastos -->
-            <Spinner
+            <!--<Spinner
                 android:id="@+id/spinner_categoria_gastos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="16dp"/>-->
 
             <!-- Leyenda "Tipo" -->
-            <TextView
+            <!--<TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tipo"
                 android:textSize="16sp"
-                android:layout_marginBottom="8dp"/>
-
+                android:layout_marginBottom="8dp"/>-->
             <!-- Spinner para Tipo de Gastos -->
-            <Spinner
+            <!--<Spinner
                 android:id="@+id/spinner_tipo_gastos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="16dp"/>-->
 
             <!-- Leyenda "Monto" -->
-            <TextView
+            <!--<TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Monto"
                 android:textSize="16sp"
-                android:layout_marginBottom="8dp"/>
+                android:layout_marginBottom="8dp"/>-->
 
             <!-- Campo de texto para ingresar monto de Gastos -->
-            <EditText
+            <!--<EditText
                 android:id="@+id/et_monto_gastos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="numberDecimal"
                 android:hint="Ingrese un monto"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="16dp"/>-->
 
             <!-- Botón para guardar el monto de Gastos -->
-            <Button
+            <!--<Button
                 android:id="@+id/btn_guardar_monto_gastos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Guardar Monto"
                 android:backgroundTint="@color/secondary"
                 android:textColor="#FFFFFF"
-                android:layout_marginBottom="24dp"/>
+                android:layout_marginBottom="24dp"/> -->
             <Button
                 android:id="@+id/btnreggas"
                 android:layout_width="match_parent"

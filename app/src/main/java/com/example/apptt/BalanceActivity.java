@@ -15,6 +15,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.mikephil.charting.charts.PieChart;
@@ -22,6 +24,12 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,14 +46,16 @@ public class BalanceActivity extends AppCompatActivity {
     private static final String HISTORIAL_KEY2 = "Historial2";
     private double totalIngresos = 0.0;
     private double totalGastos = 0.0;
+    private double totalbalance = 0.0;
     private PieChart pieChart;
+    private TextView tvHistorial, tvHistorialg,tvBalanceMensual;
     private ArrayList<PieEntry> entries = new ArrayList<>();
+    private HashMap<String, Double> ingresosPorCategoria = new HashMap<>();
+    private HashMap<String, Double> gastosPorCategoria = new HashMap<>();
 
     // Nuevas variables para el gráfico de ingresos por categoría
     private PieChart pieChartIngresos;
-    private Map<String, Double> ingresosPorCategoria;
     private PieChart pieChartGastos;
-    private Map<String, Double> gastosPorCategoria;
     private static final int[] COLORES_CATEGORIAS = {
             Color.rgb(64, 89, 128),  // Azul
             Color.rgb(149, 165, 124), // Verde
@@ -80,80 +90,54 @@ public class BalanceActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 
         // Inicializar el TextView del Historial y el Balance Mensual
-        final TextView tvHistorial = findViewById(R.id.tv_historial);
-        final TextView tvHistorialg = findViewById(R.id.tv_historialg);
-        final TextView tvBalanceMensual = findViewById(R.id.tv_balance_mensual);
+        tvHistorial = findViewById(R.id.tv_historial);
+        tvHistorialg = findViewById(R.id.tv_historialg);
+        tvBalanceMensual = findViewById(R.id.tv_balance_mensual);
 
         // Cargar historial guardado si existe
         String historialGuardado = sharedPreferences.getString(HISTORIAL_KEY, "");
         historial.append(historialGuardado);
         tvHistorial.setText(historial.toString());
 
-        // Recuperar los totales de ingresos y gastos guardados
-        totalIngresos = Double.longBitsToDouble(sharedPreferences.getLong("totalIngresos", Double.doubleToLongBits(0.0)));
-        totalGastos = Double.longBitsToDouble(sharedPreferences.getLong("totalGastos", Double.doubleToLongBits(0.0)));
-
         // Inicializar la gráfica de pastel del balance
         pieChart = findViewById(R.id.pie_chart);
         pieChart.setUsePercentValues(true);
         pieChart.getDescription().setEnabled(false);
-        configurarGraficoPrincipal();
-        actualizarGrafico();  // Inicializa el gráfico al iniciar la actividad
+       // actualizarGrafico();  // Inicializa el gráfico al iniciar la actividad
 
         //Inicializacion del nuevo gráfico de ingresos
         pieChartIngresos = findViewById(R.id.pie_chart_ingresos);
-        ingresosPorCategoria = new HashMap<>();
         configurarGraficoIngresos();
 
         //Inicialización del gráfico de gastos
         pieChartGastos = findViewById(R.id.pie_chart_gastos);
-        gastosPorCategoria = new HashMap<>();
         configurarGraficoGastos();
 
-        // Recuperar datos guardados de ingresos por categoría
-        Map<String, ?> todasLasCategorias = sharedPreferences.getAll();
-        for (Map.Entry<String, ?> entry : todasLasCategorias.entrySet()) {
-            if (entry.getKey().startsWith("categoria_")) {
-                String categoria = entry.getKey().substring(10);
-                double valor = Double.longBitsToDouble((Long) entry.getValue());
-                ingresosPorCategoria.put(categoria, valor);
-            }
-        }
-
-        // Recuperar datos guardados de gastos por categoría
-        Map<String, ?> todosLosGastos = sharedPreferences.getAll();
-        for (Map.Entry<String, ?> entry : todosLosGastos.entrySet()) {
-            if (entry.getKey().startsWith("categoria_gasto_")) {
-                String categoria = entry.getKey().substring(16); // "categoria_gasto_" tiene 16 caracteres
-                double valor = Double.longBitsToDouble((Long) entry.getValue());
-                gastosPorCategoria.put(categoria, valor);
-            }
-        }
-
+        //configurarGraficoPrincipal(totalIngresos,totalGastos);
         // ---------- INICIA SECCIÓN DE INGRESOS ----------
 
         // Inicializar Spinners para Categoría y Tipo de Ingresos
-        Spinner spinnerCategoria = findViewById(R.id.spinner_categoria);
-        Spinner spinnerTipo = findViewById(R.id.spinner_tipo);
+        //Spinner spinnerCategoria = findViewById(R.id.spinner_categoria);
+        //Spinner spinnerTipo = findViewById(R.id.spinner_tipo);
 
         // Configurar el adaptador para el Spinner de Categoría
-        ArrayAdapter<CharSequence> adapterCategoria = ArrayAdapter.createFromResource(this,
+        /*ArrayAdapter<CharSequence> adapterCategoria = ArrayAdapter.createFromResource(this,
                 R.array.opciones_categoria_ingresos, android.R.layout.simple_spinner_item);
         adapterCategoria.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerCategoria.setAdapter(adapterCategoria);
+        spinnerCategoria.setAdapter(adapterCategoria);*/
 
         // Configurar el adaptador para el Spinner de Tipo de Ingresos
-        ArrayAdapter<CharSequence> adapterTipo = ArrayAdapter.createFromResource(this,
+        /*ArrayAdapter<CharSequence> adapterTipo = ArrayAdapter.createFromResource(this,
                 R.array.opciones_tipo_ingresos, android.R.layout.simple_spinner_item);
         adapterTipo.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerTipo.setAdapter(adapterTipo);
+        spinnerTipo.setAdapter(adapterTipo);*/
 
         // Inicializar el campo de texto para ingresar el monto de Ingresos
-        EditText etMonto = findViewById(R.id.et_monto);
+        //EditText etMonto = findViewById(R.id.et_monto);
 
         // Manejar el botón para guardar el monto de Ingresos
-        Button btnGuardarMonto = findViewById(R.id.btn_guardar_monto);
-        btnGuardarMonto.setOnClickListener(new View.OnClickListener() {
+        //Button btnGuardarMonto = findViewById(R.id.btn_guardar_monto);
+        /* btnGuardarMonto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String categoria = spinnerCategoria.getSelectedItem().toString();
@@ -174,7 +158,7 @@ public class BalanceActivity extends AppCompatActivity {
                     editor.apply();
 
                     // Agregar información al historial
-                    /*historial.append("Ingreso: \n")
+                            historial.append("Ingreso: \n")
                             .append("Categoría: ").append(categoria)
                             .append(", Tipo: ").append(tipo)
                             .append(", Monto: $").append(monto)
@@ -183,10 +167,9 @@ public class BalanceActivity extends AppCompatActivity {
                     //        .append("$").append(totalIngresos);
 
                     // Actualizar el balance mensual
-                    actualizarBalance(tvBalanceMensual);
-                    actualizaringresos(tvHistorial);
-                    actualizarGrafico();
-                    actualizarGraficoIngresos();
+                    //actualizarBalance(tvBalanceMensual);
+                    //actualizarGrafico();
+                    //actualizarGraficoIngresos();
 
                     // Guardar el historial en SharedPreferences
                     //guardarHistorial();
@@ -195,14 +178,14 @@ public class BalanceActivity extends AppCompatActivity {
                     //tvHistorial.setText(historial.toString());
 
                     // Solo limpiar el campo de monto
-                    etMonto.setText("");
+                    //etMonto.setText("");
 
-                    Toast.makeText(BalanceActivity.this, "Monto de Ingresos guardado", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(BalanceActivity.this, "Por favor, ingrese un monto", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+                    //Toast.makeText(BalanceActivity.this, "Monto de Ingresos guardado", Toast.LENGTH_SHORT).show();
+                //} else {
+                 //   Toast.makeText(BalanceActivity.this, "Por favor, ingrese un monto", Toast.LENGTH_SHORT).show();
+                //}
+            //}
+        //});
         Button btreging = findViewById(R.id.btnreging);
         btreging.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -240,11 +223,11 @@ public class BalanceActivity extends AppCompatActivity {
         });
 
         // Inicializar Spinners para Categoría y Tipo de Gastos
-        Spinner spinnerCategoriaGastos = findViewById(R.id.spinner_categoria_gastos);
-        Spinner spinnerTipoGastos = findViewById(R.id.spinner_tipo_gastos);
+        //Spinner spinnerCategoriaGastos = findViewById(R.id.spinner_categoria_gastos);
+        //Spinner spinnerTipoGastos = findViewById(R.id.spinner_tipo_gastos);
 
         // Configurar el adaptador para el Spinner de Categoría de Gastos
-        ArrayAdapter<CharSequence> adapterCategoriaGastos = ArrayAdapter.createFromResource(this,
+        /*ArrayAdapter<CharSequence> adapterCategoriaGastos = ArrayAdapter.createFromResource(this,
                 R.array.opciones_categoria_gastos, android.R.layout.simple_spinner_item);
         adapterCategoriaGastos.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCategoriaGastos.setAdapter(adapterCategoriaGastos);
@@ -292,10 +275,9 @@ public class BalanceActivity extends AppCompatActivity {
                     //      .append(totalGastos);
 
                     // Actualizar el balance mensual
-                    actualizarBalance(tvBalanceMensual);
-                    actualizarGastos(tvHistorialg);
-                    actualizarGrafico();
-                    actualizarGraficoGastos();
+                    //actualizarBalance(tvBalanceMensual);
+                    //actualizarGrafico();
+                    //actualizarGraficoGastos();
 
                     // Guardar el historial en SharedPreferences
                     //guardarHistorial();
@@ -304,14 +286,14 @@ public class BalanceActivity extends AppCompatActivity {
                     //tvHistorialg.setText(historial2.toString());
 
                     // Solo limpiar el campo de monto
-                    etMontoGastos.setText("");
+                    //etMontoGastos.setText("");
 
-                    Toast.makeText(BalanceActivity.this, "Monto de Gastos guardado", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(BalanceActivity.this, "Por favor, ingrese un monto de Gastos", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+                    //Toast.makeText(BalanceActivity.this, "Monto de Gastos guardado", Toast.LENGTH_SHORT).show();
+                //} else {
+                    //Toast.makeText(BalanceActivity.this, "Por favor, ingrese un monto de Gastos", Toast.LENGTH_SHORT).show();
+                //}
+            //}
+        //});
 
         // ---------- INICIA SECCIÓN DEL BOTÓN BORRAR HISTORIAL ----------
 
@@ -343,7 +325,7 @@ public class BalanceActivity extends AppCompatActivity {
                 pieChartGastos.clear();
 
                 // Reconfigurar las gráficas vacías
-                configurarGraficoPrincipal();
+                //configurarGraficoPrincipal();
                 configurarGraficoIngresos();
                 configurarGraficoGastos();
 
@@ -412,15 +394,11 @@ public class BalanceActivity extends AppCompatActivity {
 
     }
 
-    private void actualizarGastos(TextView tvHistorialg) {
-        tvHistorialg.setText("Gastos Totales\n\n"+String.format("$ %.2f", totalGastos));
-    }
 
-    private void actualizaringresos(TextView tvHistorial) {
-        tvHistorial.setText("Ingresos Totales\n\n"+String.format("$ %.2f", totalIngresos));
-    }
-
-    private void configurarGraficoPrincipal() {
+    private void configurarGraficoPrincipal(double totalIngresos, double totalGastos) {
+        pieChart.setUsePercentValues(true);
+        pieChart.getDescription().setEnabled(false);
+        pieChart.setDrawHoleEnabled(true);
         pieChart.setUsePercentValues(true);
         pieChart.getDescription().setEnabled(false);
         pieChart.setDrawHoleEnabled(true);
@@ -431,145 +409,207 @@ public class BalanceActivity extends AppCompatActivity {
         pieChart.setCenterTextSize(16f);
         pieChart.animateY(1000);
 
-        // Agregar datos iniciales vacíos (igual que en las otras gráficas)
-        ArrayList<PieEntry> entriesIniciales = new ArrayList<>();
-        entriesIniciales.add(new PieEntry(1f, "Sin datos"));
+        ArrayList<PieEntry> entries = new ArrayList<>();
 
-        PieDataSet dataSetInicial = new PieDataSet(entriesIniciales, "");
-        dataSetInicial.setColor(Color.LTGRAY);
-        dataSetInicial.setValueTextSize(0f); // Ocultar los valores
-        dataSetInicial.setValueTextColor(Color.TRANSPARENT); // Hacer transparente el texto
+        // Verificar si hay datos de ingresos y gastos
+        if (totalIngresos > 0 || totalGastos > 0) {
+            if (totalIngresos > 0) {
+                entries.add(new PieEntry((float) totalIngresos, "Ingresos"));
+            }
+            if (totalGastos > 0) {
+                entries.add(new PieEntry((float) totalGastos, "Gastos"));
+            }
+        } else {
+            // Si no hay datos, mostrar un mensaje de "Sin datos"
+            entries.add(new PieEntry(1f, "Sin datos"));
+        }
 
-        PieData pieDataInicial = new PieData(dataSetInicial);
-        pieChart.setData(pieDataInicial);
-        pieChart.invalidate();
+        // Configurar el conjunto de datos
+        PieDataSet dataSet = new PieDataSet(entries, "Resumen Financiero");
+        dataSet.setColors(ColorTemplate.COLORFUL_COLORS); // Usa una paleta de colores predefinida
+        dataSet.setValueTextSize(12f);
+        dataSet.setValueTextColor(Color.BLACK);
+
+        PieData pieData = new PieData(dataSet);
+        pieChart.setData(pieData);
+        pieChart.invalidate(); // Refrescar el gráfico
+        totalbalance = totalIngresos - totalGastos;
+        tvBalanceMensual.setText(String.format("$ %.2f",totalbalance));
     }
 
     private void configurarGraficoIngresos() {
-        pieChartIngresos.setUsePercentValues(true);
-        pieChartIngresos.getDescription().setEnabled(false);
-        pieChartIngresos.setDrawHoleEnabled(true);
-        pieChartIngresos.setHoleColor(Color.WHITE);
-        pieChartIngresos.setTransparentCircleRadius(61f);
-        pieChartIngresos.setDrawCenterText(true);
-        pieChartIngresos.setCenterText("Ingresos por Categoría");
-        pieChartIngresos.setCenterTextSize(16f);
-        pieChartIngresos.animateY(1000);
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance()
+                .getReference("Ingresos")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-        // Agregar datos iniciales vacíos
-        ArrayList<PieEntry> entriesIniciales = new ArrayList<>();
-        entriesIniciales.add(new PieEntry(1f, "Sin ingresos"));
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                ingresosPorCategoria.clear(); // Limpiar el mapa antes de llenarlo con nuevos datos
+                totalIngresos = 0.0;
 
-        PieDataSet dataSetInicial = new PieDataSet(entriesIniciales, "");
-        dataSetInicial.setColor(Color.LTGRAY);
-        dataSetInicial.setValueTextSize(0f);
+                // Procesar cada ingreso en la base de datos
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Ingreso ingreso = snapshot.getValue(Ingreso.class);
+                    if (ingreso != null) {
+                        String categoria = ingreso.getCategoria();
+                        double monto = ingreso.getMonto();
 
-        PieData pieDataInicial = new PieData(dataSetInicial);
-        pieChartIngresos.setData(pieDataInicial);
-        pieChartIngresos.invalidate();
+                        totalIngresos +=monto;
+
+                        // Agregar o actualizar el monto en el mapa
+                        if (ingresosPorCategoria.containsKey(categoria)) {
+                            ingresosPorCategoria.put(categoria, ingresosPorCategoria.get(categoria) + monto);
+                        } else {
+                            ingresosPorCategoria.put(categoria, monto);
+                        }
+                    }
+                }
+
+                // Llamar al método para actualizar el gráfico después de cargar los datos
+                actualizarGraficoIngresos();
+                if (totalIngresos != 0.0 || dataSnapshot.getChildrenCount() == 0) {
+                    configurarGraficoPrincipal(totalIngresos, totalGastos);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(getApplicationContext(), "Error al cargar los datos de Firebase", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void configurarGraficoGastos() {
-        pieChartGastos.setUsePercentValues(true);
-        pieChartGastos.getDescription().setEnabled(false);
-        pieChartGastos.setDrawHoleEnabled(true);
-        pieChartGastos.setHoleColor(Color.WHITE);
-        pieChartGastos.setTransparentCircleRadius(61f);
-        pieChartGastos.setDrawCenterText(true);
-        pieChartGastos.setCenterText("Gastos por Categoría");
-        pieChartGastos.setCenterTextSize(16f);
-        pieChartGastos.animateY(1000);
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance()
+                .getReference("Gastos")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-        // Agregar datos iniciales vacíos
-        ArrayList<PieEntry> entriesIniciales = new ArrayList<>();
-        entriesIniciales.add(new PieEntry(1f, "Sin gastos"));
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                gastosPorCategoria.clear(); // Limpiar el mapa antes de llenarlo con nuevos datos
+                totalGastos = 0.0;
 
-        PieDataSet dataSetInicial = new PieDataSet(entriesIniciales, "");
-        dataSetInicial.setColor(Color.LTGRAY);
-        dataSetInicial.setValueTextSize(0f);
+                // Procesar cada ingreso en la base de datos
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Gasto gasto = snapshot.getValue(Gasto.class);
+                    if (gasto != null) {
+                        String categoria = gasto.getCategoria();
+                        double monto = gasto.getMonto();
+                        totalGastos += monto;
 
-        PieData pieDataInicial = new PieData(dataSetInicial);
-        pieChartGastos.setData(pieDataInicial);
-        pieChartGastos.invalidate();
+                        // Agregar o actualizar el monto en el mapa
+                        if (gastosPorCategoria.containsKey(categoria)) {
+                            gastosPorCategoria.put(categoria, gastosPorCategoria.get(categoria) + monto);
+                        } else {
+                            gastosPorCategoria.put(categoria, monto);
+                        }
+                    }
+                }
+
+                // Llamar al método para actualizar el gráfico después de cargar los datos
+                actualizarGraficoGastos();
+                if (totalGastos != 0.0 || dataSnapshot.getChildrenCount() == 0) {
+                    configurarGraficoPrincipal(totalIngresos, totalGastos);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(getApplicationContext(), "Error al cargar los datos de Firebase", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void actualizarGraficoIngresos() {
-        entries.clear();
         ArrayList<PieEntry> entriesIngresos = new ArrayList<>();
 
-        // Agregar entradas solo si hay valores mayores que 0
+        // Agregar entradas al gráfico solo si hay valores mayores que 0
         for (Map.Entry<String, Double> entry : ingresosPorCategoria.entrySet()) {
             if (entry.getValue() > 0) {
                 entriesIngresos.add(new PieEntry(entry.getValue().floatValue(), entry.getKey()));
             }
         }
 
-        PieDataSet dataSetIngresos = new PieDataSet(entriesIngresos, "\n Categorías de Ingresos");
-        dataSetIngresos.setColors(COLORES_CATEGORIAS);
+        // Si no hay ingresos, mostrar una entrada predeterminada
+        if (entriesIngresos.isEmpty()) {
+            entriesIngresos.add(new PieEntry(1f, "Sin ingresos"));
+        }
+
+        PieDataSet dataSetIngresos = new PieDataSet(entriesIngresos, "Categorías de Ingresos");
+        dataSetIngresos.setColors(ColorTemplate.MATERIAL_COLORS); // Usa colores predeterminados
         dataSetIngresos.setValueTextSize(12f);
         dataSetIngresos.setValueTextColor(Color.BLACK);
 
         PieData pieDataIngresos = new PieData(dataSetIngresos);
         pieChartIngresos.setData(pieDataIngresos);
-        pieChartIngresos.invalidate();
+        pieChartIngresos.invalidate(); // Refrescar el gráfico
+        tvHistorial.setText("Ingresos Totales\n\n"+String.format("$ %.2f", totalIngresos));
     }
 
     private void actualizarGraficoGastos() {
-        entries.clear();
         ArrayList<PieEntry> entriesGastos = new ArrayList<>();
 
-        // Agregar entradas solo si hay valores mayores que 0
+        // Agregar entradas al gráfico solo si hay valores mayores que 0
         for (Map.Entry<String, Double> entry : gastosPorCategoria.entrySet()) {
             if (entry.getValue() > 0) {
                 entriesGastos.add(new PieEntry(entry.getValue().floatValue(), entry.getKey()));
             }
         }
 
-        PieDataSet dataSetGastos = new PieDataSet(entriesGastos, "\n Categorías de Gastos");
-        dataSetGastos.setColors(COLORES_CATEGORIAS);
+        // Si no hay ingresos, mostrar una entrada predeterminada
+        if (entriesGastos.isEmpty()) {
+            entriesGastos.add(new PieEntry(1f, "Sin gastos"));
+        }
+
+        PieDataSet dataSetGastos = new PieDataSet(entriesGastos, "Categorías de Gastos");
+        dataSetGastos.setColors(ColorTemplate.MATERIAL_COLORS); // Usa colores predeterminados
         dataSetGastos.setValueTextSize(12f);
         dataSetGastos.setValueTextColor(Color.BLACK);
 
         PieData pieDataGastos = new PieData(dataSetGastos);
         pieChartGastos.setData(pieDataGastos);
-        pieChartGastos.invalidate();
+        pieChartGastos.invalidate(); // Refrescar el gráfico
+        tvHistorialg.setText("Gastos Totales\n\n"+String.format("$ %.2f", totalGastos));
     }
 
     // En el método actualizarGrafico()
     private void actualizarGrafico() {
-        ArrayList<PieEntry> entriesGrafico = new ArrayList<>();
+        pieChart.setUsePercentValues(true);
+        pieChart.getDescription().setEnabled(false);
+        pieChart.setDrawHoleEnabled(true);
+        pieChart.setHoleColor(Color.WHITE);
+        pieChart.setTransparentCircleRadius(61f);
+        pieChart.setDrawCenterText(true);
+        pieChart.setCenterText("Balance Total");
+        pieChart.setCenterTextSize(16f);
+        pieChart.animateY(1000);
 
-        // Añadir las nuevas entradas con los datos de ingresos y gastos solo si hay valores mayores que 0
+        ArrayList<PieEntry> entries = new ArrayList<>();
+
+        // Verificar si hay datos de ingresos y gastos
         if (totalIngresos > 0 || totalGastos > 0) {
             if (totalIngresos > 0) {
-                entriesGrafico.add(new PieEntry((float) totalIngresos, "Ingresos"));
+                entries.add(new PieEntry((float) totalIngresos, "Ingresos"));
             }
             if (totalGastos > 0) {
-                entriesGrafico.add(new PieEntry((float) totalGastos, "Gastos"));
+                entries.add(new PieEntry((float) totalGastos, "Gastos"));
             }
-
-            PieDataSet dataSetGrafico = new PieDataSet(entriesGrafico, "\n Distribución de Ingresos y Gastos");
-            dataSetGrafico.setColors(ColorTemplate.COLORFUL_COLORS);
-            dataSetGrafico.setValueTextSize(12f);
-            dataSetGrafico.setValueTextColor(Color.BLACK); // Mostrar valores cuando hay datos
-
-            PieData pieDataGrafico = new PieData(dataSetGrafico);
-            pieChart.setData(pieDataGrafico);
         } else {
-            // Si no hay datos, mostrar el estado inicial
-            ArrayList<PieEntry> entriesIniciales = new ArrayList<>();
-            entriesIniciales.add(new PieEntry(1f, "Sin datos"));
-
-            PieDataSet dataSetInicial = new PieDataSet(entriesIniciales, "");
-            dataSetInicial.setColor(Color.LTGRAY);
-            dataSetInicial.setValueTextSize(0f);
-            dataSetInicial.setValueTextColor(Color.TRANSPARENT);
-
-            PieData pieDataInicial = new PieData(dataSetInicial);
-            pieChart.setData(pieDataInicial);
+            // Si no hay datos, mostrar un mensaje de "Sin datos"
+            entries.add(new PieEntry(1f, "Sin datos"));
         }
 
-        pieChart.invalidate();
+        // Configurar el conjunto de datos
+        PieDataSet dataSet = new PieDataSet(entries, "Resumen Financiero");
+        dataSet.setColors(ColorTemplate.COLORFUL_COLORS); // Usa una paleta de colores predefinida
+        dataSet.setValueTextSize(12f);
+        dataSet.setValueTextColor(Color.BLACK);
+
+        PieData pieData = new PieData(dataSet);
+        pieChart.setData(pieData);
+        pieChart.invalidate(); // Refrescar el gráfico
     }
 
 
