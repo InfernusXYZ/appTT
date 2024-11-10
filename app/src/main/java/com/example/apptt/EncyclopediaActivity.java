@@ -107,12 +107,10 @@ public class EncyclopediaActivity extends AppCompatActivity {
 
     private void actualizarContenido(){
         contador++;
-        String[] titulos= {"¿Que es un ingreso?",
-                "¿Que es un gasto?",
-                "¿Que es una deuda?"};
-        String[] descripciones={"Un ingreso es toda aquella ganancia que se recibe por la venta de un bien o servicio, que generalmente se hace efectiva mediante un cobro en forma de dinero.",
-                "El gasto es el uso de un cierto dinero presupuestado, ya sea por parte de un individuo, una empresa, una organización o un Estado, para obtener a cambio un bien o un servicio determinado." ,
-                "La deuda es una obligación que tiene una persona física o jurídica para cumplir sus compromisos de pago, fruto del ejercicio de su actividad económica."};
+        String[] titulos= {"Consejo #1","Consejo #2","Consejo #3"};
+        String[] descripciones={"Se recomienda una distribucion de 30% para uso propio, 30% para ahorro, 30% para invertir y 10% caridad(opcional), para tener un gran equilibrio en tus finanzas",
+                "De las mejores inversiones que puedes hacer es invertir en ti mismo." ,
+                "Si no puedes comprar algo 2 veces o más es una un mal gasto "};
         //String nuevoContenido="Descripcion #"+contador;
         tvDescripcion.setText(descripciones[contador]);
         tvtitulo.setText(titulos[contador]);

@@ -1,10 +1,13 @@
 package com.example.apptt;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.SpannableString;
+import android.text.TextUtils;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -15,6 +18,8 @@ import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import android.widget.TextView;
@@ -29,20 +34,41 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AhorroActivity extends AppCompatActivity {
 
-    private EditText etIngresosMensuales, etAhorroMensual;
-    private TextView tvHistorialAhorro, tvHistorialahorromen, tvHistorialporcentge;
+    private EditText etIngresosMensuales, etAhorroMensual, etmetaahorro;
+    private TextView tvHistorialAhorro, tvHistorialahorromen, tvHistorialporcentge, tvprogreso;
     private PieChart pieChart;
     private BarChart barChart;
     private List<String> historialList;
     private List<String> historialahorro;
     private List<String> historialporcentaje;
+    private double metaAhorro = 0.0;
+    private boolean metacumplida = false;
+    private double progresoAhorro = 0.0;
+    private DatabaseReference metaRef, ahorroRef;
+    private Button btnmeta, btnreinicio;
+    private ValueEventListener metaListener;
+    private ValueEventListener ahorrosListener;
+    private boolean isListenerInitialized = false;
+    private String ingresosStr, ahorroStr;
+    private DatabaseReference mDatabase;
+    private FirebaseAuth mAuth;
 
     private SharedPreferences sharedPreferences;
 
@@ -66,9 +92,11 @@ public class AhorroActivity extends AppCompatActivity {
 
         etIngresosMensuales = findViewById(R.id.et_ingresos_mensuales);
         etAhorroMensual = findViewById(R.id.et_ahorro_mensual);
+        etmetaahorro = findViewById(R.id.et_meta);
         tvHistorialAhorro = findViewById(R.id.tv_historial_ahorro);
         tvHistorialahorromen = findViewById(R.id.tv_historial_ahorro_men);
         tvHistorialporcentge = findViewById(R.id.tv_historial_porcentage);
+        tvprogreso = findViewById(R.id.tvprogresometa);
         pieChart = findViewById(R.id.pieChart);
         barChart = findViewById(R.id.barChart);
         Button btnCalcular = findViewById(R.id.btn_calcular);
@@ -77,7 +105,17 @@ public class AhorroActivity extends AppCompatActivity {
         Button btnBalance = findViewById(R.id.btn_balance);
         Button btnAhorros = findViewById(R.id.btn_ahorros);
         Button btnEndeudamiento = findViewById(R.id.btn_endeudamiento);
+        Button btninsert = findViewById(R.id.btn_inAhorro);
+        btnmeta = findViewById(R.id.btn_meta);
+        btnreinicio = findViewById(R.id.btn_reiniciometa);
+        mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        String userId = auth.getCurrentUser().getUid();
+
+        metaRef = FirebaseDatabase.getInstance().getReference("Metas").child(userId);
+        ahorroRef = FirebaseDatabase.getInstance().getReference("Ahorros").child(userId);
         // Inicializar SharedPreferences
         sharedPreferences = getSharedPreferences("AhorroPrefs", Context.MODE_PRIVATE);
 
@@ -86,12 +124,39 @@ public class AhorroActivity extends AppCompatActivity {
         historialporcentaje = new ArrayList<>();
         // Cargar historial desde SharedPreferences
         loadHistorial();
-
+        if (!isListenerInitialized) {
+            cargarMetaAhorro();
+            isListenerInitialized = true;
+        }
         // Inicializar las gráficas en blanco
         initializeCharts();
 
+        btninsert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(AhorroActivity.this,InsertAhorro.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        btnmeta.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                guardarmetaahorro();
+            }
+        });
+
+        btnreinicio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirmarReinicioMeta();
+            }
+        });
+
         btnCalcular.setOnClickListener(v -> {
-            String ingresosStr = etIngresosMensuales.getText().toString();
+            guardarahorro();
+            /*String ingresosStr = etIngresosMensuales.getText().toString();
             String ahorroStr = etAhorroMensual.getText().toString();
 
             if (!ingresosStr.isEmpty() && !ahorroStr.isEmpty()) {
@@ -106,38 +171,42 @@ public class AhorroActivity extends AppCompatActivity {
                     /*String resultado = "\nIngresos Mensuales: $" + ingresosMensuales +
                             ", \nAhorro Mensual: $" + ahorroMensual +
                             ", \nTasa de Ahorro: " + porcentajeAhorro + "%\n";*/
-                    historialList.add(ingmen);
-                    historialahorro.add(ahomen);
-                    historialporcentaje.add(peraho);
-                    actualizarHistorial();
+                    //historialList.add(ingmen);
+                    //historialahorro.add(ahomen);
+                    //historialporcentaje.add(peraho);
+                    //actualizarHistorial();
 
                     // Guardar historial en SharedPreferences
-                    saveHistorial();
+                    //saveHistorial();
 
-                    Toast.makeText(AhorroActivity.this, "Tasa de ahorro: " + porcentajeAhorro + "%", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(AhorroActivity.this, "Tasa de ahorro: " + porcentajeAhorro + "%", Toast.LENGTH_LONG).show();
 
-                    actualizarGraficas(ingresosMensuales, ahorroMensual);
+                    //actualizarGraficas(ingresosMensuales, ahorroMensual);
 
                     // Vaciar los campos llenables
-                    etIngresosMensuales.setText("");
-                    etAhorroMensual.setText("");
-                } else {
-                    Toast.makeText(AhorroActivity.this, "El ingreso mensual debe ser mayor a 0.", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(AhorroActivity.this, "Por favor, complete ambos campos antes de calcular.", Toast.LENGTH_SHORT).show();
-            }
+                    //etIngresosMensuales.setText("");
+                    //etAhorroMensual.setText("");
+                //} else {
+                //    Toast.makeText(AhorroActivity.this, "El ingreso mensual debe ser mayor a 0.", Toast.LENGTH_SHORT).show();
+                //}
+            //} else {
+              //  Toast.makeText(AhorroActivity.this, "Por favor, complete ambos campos antes de calcular.", Toast.LENGTH_SHORT).show();
+            //}
         });
 
         btnBorrarHistorial.setOnClickListener(v -> {
-            historialList.clear();
+            Intent intent = new Intent(AhorroActivity.this,HistorialAhorro.class);
+            startActivity(intent);
+            /*historialList.clear();
             historialahorro.clear();
             historialporcentaje.clear();
             actualizarHistorial();
             initializeCharts(); // Reiniciar gráficas a estado en blanco
             clearHistorial(); // Limpiar historial en SharedPreferences
             Toast.makeText(AhorroActivity.this, "Historial y gráficas borradas", Toast.LENGTH_SHORT).show();
+        */
         });
+
 
         btnEnciclopedia.setOnClickListener(v -> startActivity(new Intent(AhorroActivity.this, EncyclopediaActivity.class)));
         btnBalance.setOnClickListener(v -> startActivity(new Intent(AhorroActivity.this, BalanceActivity.class)));
@@ -230,11 +299,183 @@ public class AhorroActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onStart(){
+        super.onStart();
+        cargarMetaAhorro();
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        if (metaListener != null){
+            metaRef.removeEventListener(metaListener);
+        }
+        if (ahorrosListener != null){
+            ahorroRef.removeEventListener(ahorrosListener);
+        }
+        isListenerInitialized = false;
+    }
+
+    private void cargarMetaAhorro(){
+      metaListener = metaRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    metaAhorro = snapshot.getValue(Double.class);
+                    if (metaAhorro > 0){
+                        desactivarEdicionMeta();
+                    }
+                       actualizarprogreso();
+                    }
+                }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(AhorroActivity.this,"Error al cargar meta",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+       ahorrosListener = ahorroRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                progresoAhorro = 0.0;
+                for (DataSnapshot ahorroSnapshot: snapshot.getChildren()){
+                    Ahorro ahorro = ahorroSnapshot.getValue(Ahorro.class);
+                    if (ahorro != null){
+                        progresoAhorro += ahorro.getAhorroMensual();
+                    }
+                }
+                verificarMeta();
+                actualizarprogreso();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(AhorroActivity.this,"Error al cargar ahorros",Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void guardarmetaahorro(){
+        String metainput =  etmetaahorro.getText().toString().trim();
+        if (!metainput.isEmpty()){
+            metacumplida = false;
+            actualizarprogreso();
+            metaAhorro = Double.parseDouble(metainput);
+            metaRef.setValue(metaAhorro);
+            etmetaahorro.setText("");
+            desactivarEdicionMeta();
+            Toast.makeText(this,"Meta de ahorro guardada",Toast.LENGTH_SHORT).show();
+            actualizarprogreso();
+        }else{
+            Toast.makeText(this,"Por favor ingresar una meta valida",Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    private void desactivarEdicionMeta(){
+        etmetaahorro.setEnabled(false);
+        btnmeta.setEnabled(false);
+
+    }
+
+    private void activarEdicionMeta(){
+        etmetaahorro.setEnabled(true);
+        btnmeta.setEnabled(true);
+
+    }
+
+    private void actualizarprogreso(){
+        tvprogreso.setText("Progreso actual: "+ progresoAhorro +" / "+ metaAhorro);
+
+    }
+
+    private void verificarMeta(){
+        if (progresoAhorro >= metaAhorro && metaAhorro > 0){
+            metacumplida = true;
+            if(!isFinishing() && metacumplida == true) {
+                mostrarmensajeexito();
+            }
+        }
+    }
+
+    private void mostrarmensajeexito(){
+        new AlertDialog.Builder(this)
+                .setTitle("Meta Alcanzada")
+                .setMessage("¿Estas seguro de que deseas reiniciar tu meta de ahorro?")
+                .setPositiveButton("Ok",(dialog, which) -> reiniciarMeta())
+                .setNegativeButton("Cancelar",null)
+                .show();
+    }
+
+    private void confirmarReinicioMeta(){
+        new AlertDialog.Builder(this)
+                .setTitle("Reiniciar Meta")
+                .setMessage("¿Estas seguro de que deseas reiniciar tu meta de ahorro")
+                .setPositiveButton("Si",(dialog, which) -> reiniciarMeta())
+                .setNegativeButton("Cancelar",null)
+                .show();
+
+    }
+
+    private void reiniciarMeta(){
+        ahorroRef.removeValue();
+        metaRef.setValue(0.0);
+        progresoAhorro = 0.0;
+        metacumplida = false;
+        metaAhorro = 0.0;
+        activarEdicionMeta();
+        actualizarprogreso();
+        Toast.makeText(this,"Listo para una nueva meta de ahorro",Toast.LENGTH_SHORT).show();
+    }
+
     private void clearHistorial() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.remove("historial");// Limpiar historial
         editor.remove("historial2");
         editor.remove("historial3");
         editor.apply();
+    }
+
+    private void guardarahorro(){
+        ingresosStr = etIngresosMensuales.getText().toString();
+        ahorroStr = etAhorroMensual.getText().toString();
+
+
+        if(TextUtils.isEmpty(ingresosStr)||TextUtils.isEmpty(ahorroStr)){
+            Toast.makeText(this,"Llene los campos correspondientes",Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        double Ingresomensual = Double.parseDouble(ingresosStr);
+        double Ahorromensual = Double.parseDouble(ahorroStr);
+        double porcentajeAhorro = (Ahorromensual / Ingresomensual) * 100;
+        if (Ingresomensual <= Ahorromensual){
+            Toast.makeText(this,"No puede ahorra mas de lo que gana", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String userID = mAuth.getCurrentUser().getUid();
+
+        Map<String,Object> AhorroMap = new HashMap<>();
+        AhorroMap.put("IngresoMensual",Ingresomensual);
+        AhorroMap.put("AhorroMensual",Ahorromensual);
+        AhorroMap.put("TasaAhorro",porcentajeAhorro);
+
+        etIngresosMensuales.setText("");
+        etAhorroMensual.setText("");
+
+        mDatabase.child("Ahorros").child(userID).push().setValue(AhorroMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()){
+                    Toast.makeText(AhorroActivity.this,"Ingreso guardado correctamente",Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(AhorroActivity.this,"Error al guardar el ingreso",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }
