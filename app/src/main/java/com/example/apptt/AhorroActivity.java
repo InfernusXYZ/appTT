@@ -37,6 +37,7 @@ import com.github.mikephil.charting.data.PieEntry;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -111,6 +112,7 @@ public class AhorroActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
+
         FirebaseAuth auth = FirebaseAuth.getInstance();
         String userId = auth.getCurrentUser().getUid();
 
@@ -130,6 +132,7 @@ public class AhorroActivity extends AppCompatActivity {
         }
         // Inicializar las gráficas en blanco
         initializeCharts();
+        cargarTotalesFirebaseYActualizarGraficas();
 
         btninsert.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -232,29 +235,61 @@ public class AhorroActivity extends AppCompatActivity {
         tvHistorialporcentge.setText(historialporcentage.toString());
     }
 
-    private void actualizarGraficas(double ingresosMensuales, double ahorroMensual) {
+    private void cargarTotalesFirebaseYActualizarGraficas() {
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) return;
+
+        DatabaseReference referenciaAhorros = FirebaseDatabase.getInstance().getReference("Ahorros").child(user.getUid());
+
+        referenciaAhorros.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                double totalIngresos = 0;
+                double totalAhorro = 0;
+
+                for (DataSnapshot mesSnapshot : snapshot.getChildren()) {
+                    Double ingresoMensual = mesSnapshot.child("IngresoMensual").getValue(Double.class);
+                    Double ahorroMensual = mesSnapshot.child("AhorroMensual").getValue(Double.class);
+
+                    if (ingresoMensual != null) totalIngresos += ingresoMensual;
+                    if (ahorroMensual != null) totalAhorro += ahorroMensual;
+                }
+
+                actualizarGraficas(totalIngresos, totalAhorro);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getApplicationContext(), "Error al cargar los datos", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void actualizarGraficas(double totalIngresos, double totalAhorro) {
         List<PieEntry> pieEntries = new ArrayList<>();
         List<BarEntry> barEntries = new ArrayList<>();
 
-        if (ingresosMensuales > 0 || ahorroMensual > 0) {
-            pieEntries.add(new PieEntry((float) ingresosMensuales, "Ingresos Mensuales"));
-            pieEntries.add(new PieEntry((float) ahorroMensual, "Ahorro Mensual"));
-            barEntries.add(new BarEntry(1, (float) ingresosMensuales));
-            barEntries.add(new BarEntry(2, (float) ahorroMensual));
+        if (totalIngresos > 0 || totalAhorro > 0) {
+            pieEntries.add(new PieEntry((float) totalIngresos, "Ingresos"));
+            pieEntries.add(new PieEntry((float) totalAhorro, "Ahorro"));
+            barEntries.add(new BarEntry(1, (float) totalIngresos));
+            barEntries.add(new BarEntry(2, (float) totalAhorro));
         }
 
-        PieDataSet pieDataSet = new PieDataSet(pieEntries, "Distribución de Ingresos y Ahorro");
+        PieDataSet pieDataSet = new PieDataSet(pieEntries, "Distribución Total de Ingresos y Ahorro");
         pieDataSet.setColors(new int[]{getResources().getColor(R.color.colorPrimary), getResources().getColor(R.color.colorAccent)});
         PieData pieData = new PieData(pieDataSet);
         pieChart.setData(pieData);
         pieChart.invalidate(); // refrescar la gráfica
 
-        BarDataSet barDataSet = new BarDataSet(barEntries, "Ingresos y Ahorro");
+        BarDataSet barDataSet = new BarDataSet(barEntries, "Total Ingresos y Ahorro");
         barDataSet.setColors(new int[]{getResources().getColor(R.color.colorPrimaryDark), getResources().getColor(R.color.colorAccentLight)});
         BarData barData = new BarData(barDataSet);
         barChart.setData(barData);
         barChart.invalidate(); // refrescar la gráfica
     }
+
 
     private void initializeCharts() {
         // Inicializar gráfica de pastel en blanco
