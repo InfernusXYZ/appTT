@@ -5,12 +5,14 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -21,8 +23,20 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class EndeudamientoActivity extends AppCompatActivity {
 
@@ -31,6 +45,7 @@ public class EndeudamientoActivity extends AppCompatActivity {
     private Button btnCalcular, btnBorrarHistorial, btnEnciclopedia, btnBalance, btnAhorros, btnEndeudamiento;
     private PieChart pieChart;
     private BarChart barChart;
+    private String tipostr,pagosStr,ingresosStr;
 
     // Variables para almacenar datos
     private SharedPreferences sharedPreferences;
@@ -39,6 +54,9 @@ public class EndeudamientoActivity extends AppCompatActivity {
     private static final String HISTORIAL_KEY2 = "historialI";
     private static final String HISTORIAL_KEY3 = "historialG";
     private static final String HISTORIAL_KEY4 = "historialR";
+    private DatabaseReference mDatabase;
+    private FirebaseAuth mAuth;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,13 +93,21 @@ public class EndeudamientoActivity extends AppCompatActivity {
         btnAhorros = findViewById(R.id.btn_ahorros);
         btnEndeudamiento = findViewById(R.id.btn_endeudamiento);
 
+        mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        loadSavedData();
+
+        //loadSavedData();
 
         initializeCharts();
+        cargarTotalesFirebaseYActualizarGraficas();
 
-        btnCalcular.setOnClickListener(view -> calcularEndeudamiento());
-        btnBorrarHistorial.setOnClickListener(view -> borrarHistorial());
+        btnCalcular.setOnClickListener(view -> guardardeuda());
+        btnBorrarHistorial.setOnClickListener(view -> {
+            Intent intent = new Intent(EndeudamientoActivity.this,DeudaHistorial.class);
+            startActivity(intent);
+            finish();
+        });
 
         // Configuración de los botones de la barra inferior
         btnEnciclopedia.setOnClickListener(view -> {
@@ -191,6 +217,30 @@ public class EndeudamientoActivity extends AppCompatActivity {
         barChart.invalidate();
     }
 
+    private void actualizarGraficas(double totalIngresos, double totalPagos) {
+        List<PieEntry> pieEntries = new ArrayList<>();
+        List<BarEntry> barEntries = new ArrayList<>();
+
+        if (totalIngresos > 0 || totalPagos > 0) {
+            pieEntries.add(new PieEntry((float) totalIngresos, "Ingresos"));
+            pieEntries.add(new PieEntry((float) totalPagos, "Pagos"));
+            barEntries.add(new BarEntry(1, (float) totalIngresos));
+            barEntries.add(new BarEntry(2, (float) totalPagos));
+        }
+
+        PieDataSet pieDataSet = new PieDataSet(pieEntries, "Distribución Total de Ingresos y Pagos");
+        pieDataSet.setColors(new int[]{getResources().getColor(R.color.colorPrimary), getResources().getColor(R.color.colorAccent)});
+        PieData pieData = new PieData(pieDataSet);
+        pieChart.setData(pieData);
+        pieChart.invalidate(); // refrescar la gráfica
+
+        BarDataSet barDataSet = new BarDataSet(barEntries, "Total Ingresos y Pagos");
+        barDataSet.setColors(new int[]{getResources().getColor(R.color.colorPrimaryDark), getResources().getColor(R.color.colorAccentLight)});
+        BarData barData = new BarData(barDataSet);
+        barChart.setData(barData);
+        barChart.invalidate(); // refrescar la gráfica
+    }
+
     private void saveData() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(HISTORIAL_KEY, tvHistorialEndeudamiento.getText().toString());
@@ -225,5 +275,78 @@ public class EndeudamientoActivity extends AppCompatActivity {
         // Limpiar las gráficas
         initializeCharts();
         Toast.makeText(EndeudamientoActivity.this, "Historial y gráficas borradas", Toast.LENGTH_SHORT).show();
+    }
+    private void guardardeuda(){
+        tipostr = etTipoDeuda.getText().toString();
+        ingresosStr = etIngresosMensuales.getText().toString();
+        pagosStr = etPagosMensuales.getText().toString();
+
+
+        if(TextUtils.isEmpty(ingresosStr)||TextUtils.isEmpty(pagosStr)||TextUtils.isEmpty(tipostr)){
+            Toast.makeText(this,"Llene los campos correspondientes",Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        double Ingresomensuales = Double.parseDouble(ingresosStr);
+        double Pagomensuales = Double.parseDouble(pagosStr);
+        double relacionEndeudamiento = (Pagomensuales / Ingresomensuales) * 100;
+        if (Ingresomensuales <= Pagomensuales){
+            Toast.makeText(this,"No puede ahorra mas de lo que gana", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String userID = mAuth.getCurrentUser().getUid();
+
+        Map<String,Object> DeudaMap = new HashMap<>();
+        DeudaMap.put("TipoDeuda", tipostr);
+        DeudaMap.put("IngresoMensual",Ingresomensuales);
+        DeudaMap.put("PagoMensual",Pagomensuales);
+        DeudaMap.put("Relaciondeendeudamiento",relacionEndeudamiento);
+
+        etIngresosMensuales.setText("");
+        etPagosMensuales.setText("");
+        etTipoDeuda.setText("");
+
+        mDatabase.child("Deudas").child(userID).push().setValue(DeudaMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()){
+                    Toast.makeText(EndeudamientoActivity.this,"Ingreso guardado correctamente",Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(EndeudamientoActivity.this,"Error al guardar el ingreso",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void cargarTotalesFirebaseYActualizarGraficas() {
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) return;
+
+        DatabaseReference referenciaAhorros = FirebaseDatabase.getInstance().getReference("Deudas").child(user.getUid());
+
+        referenciaAhorros.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                double totalIngresos = 0;
+                double totalPagos = 0;
+
+                for (DataSnapshot mesSnapshot : snapshot.getChildren()) {
+                    Double ingresoMensual = mesSnapshot.child("IngresoMensual").getValue(Double.class);
+                    Double pagoMensual = mesSnapshot.child("PagoMensual").getValue(Double.class);
+
+                    if (ingresoMensual != null) totalIngresos += ingresoMensual;
+                    if (pagoMensual != null) totalPagos += pagoMensual;
+                }
+
+                actualizarGraficas(totalIngresos, totalPagos);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getApplicationContext(), "Error al cargar los datos", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

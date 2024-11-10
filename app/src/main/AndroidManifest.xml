@@ -15,6 +15,9 @@
         android:theme="@style/Theme.AppTT"
         tools:targetApi="31">
         <activity
+            android:name=".DeudaHistorial"
+            android:exported="false" />
+        <activity
             android:name=".HistorialAhorro"
             android:exported="false" />
         <activity
