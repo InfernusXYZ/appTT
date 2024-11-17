@@ -1,5 +1,6 @@
 package com.example.apptt;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -40,12 +41,14 @@ import java.util.Map;
 
 public class EndeudamientoActivity extends AppCompatActivity {
 
-    private EditText etTipoDeuda, etIngresosMensuales, etPagosMensuales;
-    private TextView tvHistorialEndeudamiento, tvHistorialIngresos, tvHistorialGastos, tvHistorialrelacion;
-    private Button btnCalcular, btnBorrarHistorial, btnEnciclopedia, btnBalance, btnAhorros, btnEndeudamiento;
+    private EditText etTipoDeuda, etIngresosMensuales, etPagosMensuales, etDeuda;
+    private TextView tvprogreso,tvHistorialEndeudamiento, tvHistorialIngresos, tvHistorialGastos, tvHistorialrelacion;
+    private Button btnCalcular, btnBorrarHistorial, btnEnciclopedia, btnBalance, btnAhorros, btnEndeudamiento, btnDeuda;
     private PieChart pieChart;
     private BarChart barChart;
     private String tipostr,pagosStr,ingresosStr;
+    private double totalPagos = 0.0;
+    private double totalDeudas = 0.0;
 
     // Variables para almacenar datos
     private SharedPreferences sharedPreferences;
@@ -54,7 +57,7 @@ public class EndeudamientoActivity extends AppCompatActivity {
     private static final String HISTORIAL_KEY2 = "historialI";
     private static final String HISTORIAL_KEY3 = "historialG";
     private static final String HISTORIAL_KEY4 = "historialR";
-    private DatabaseReference mDatabase;
+    private DatabaseReference mDatabase, deudaRef;
     private FirebaseAuth mAuth;
 
 
@@ -79,11 +82,14 @@ public class EndeudamientoActivity extends AppCompatActivity {
         etTipoDeuda = findViewById(R.id.et_tipo_deuda);
         etIngresosMensuales = findViewById(R.id.et_ingresos_mensuales);
         etPagosMensuales = findViewById(R.id.et_pagos_mensuales);
+        etDeuda = findViewById(R.id.et_deuda);
         tvHistorialEndeudamiento = findViewById(R.id.tv_historial_endeudamiento);
         tvHistorialIngresos = findViewById(R.id.tv_historial_ingmen);
         tvHistorialGastos = findViewById(R.id.tv_historial_pagmen);
         tvHistorialrelacion = findViewById(R.id.tv_historial_relacion);
+        tvprogreso = findViewById(R.id.tvdeudatotal);
         btnCalcular = findViewById(R.id.btn_calcular);
+        btnDeuda = findViewById(R.id.btn_deuda);
         btnBorrarHistorial = findViewById(R.id.btn_borrar_historial);
         pieChart = findViewById(R.id.pieChartEndeudamiento);
         barChart = findViewById(R.id.barChartEndeudamiento);
@@ -97,11 +103,16 @@ public class EndeudamientoActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 
+        String Deuda = etDeuda.getText().toString();
+
         //loadSavedData();
+        cargarDatosFirebase();
+
 
         initializeCharts();
         cargarTotalesFirebaseYActualizarGraficas();
 
+        btnDeuda.setOnClickListener(view -> agregarDeudaAFirebase());
         btnCalcular.setOnClickListener(view -> guardardeuda());
         btnBorrarHistorial.setOnClickListener(view -> {
             Intent intent = new Intent(EndeudamientoActivity.this,DeudaHistorial.class);
@@ -348,5 +359,121 @@ public class EndeudamientoActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Error al cargar los datos", Toast.LENGTH_SHORT).show();
             }
         });
+
     }
+    private void desactivarEdicionMeta(){
+        etDeuda.setEnabled(false);
+        btnDeuda.setEnabled(false);
+
+    }
+
+    private void activarEdicionMeta(){
+        etDeuda.setEnabled(true);
+        btnDeuda.setEnabled(true);
+
+    }
+    private void confirmarReinicioMeta(){
+        new AlertDialog.Builder(this)
+                .setTitle("Libre de deudas")
+                .setMessage("Felicidades las deudas fueron pagadas")
+                .setPositiveButton("Ok",null)
+                .show();
+
+    }
+    private void cargarDatosFirebase() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) return;
+
+        String userId = user.getUid();
+
+        // Referencias a las tablas en Firebase
+        mDatabase = FirebaseDatabase.getInstance().getReference("Debes").child(userId);
+        deudaRef = FirebaseDatabase.getInstance().getReference("Deudas").child(userId);
+
+        // Escuchar la tabla de Deudas
+        mDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                totalDeudas = 0.0;
+
+                for (DataSnapshot deudaSnapshot : snapshot.getChildren()) {
+                    Double monto = deudaSnapshot.child("monto").getValue(Double.class);
+                    if (monto != null) {
+                        totalDeudas += monto;
+                    }
+                }
+
+                calcularDeudaTotal();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getApplicationContext(), "Error al cargar las deudas", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Escuchar la tabla de Pagos
+        deudaRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                totalPagos = 0.0;
+
+                for (DataSnapshot pagoSnapshot : snapshot.getChildren()) {
+                    Double monto = pagoSnapshot.child("PagoMensual").getValue(Double.class);
+                    if (monto != null) {
+                        totalPagos += monto;
+                    }
+                }
+
+                calcularDeudaTotal();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getApplicationContext(), "Error al cargar los pagos", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void agregarDeudaAFirebase() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String metainput =  etDeuda.getText().toString().trim();
+        Double monto = Double.parseDouble(metainput);
+        if (user == null) return;
+
+        String userId = user.getUid();
+        mDatabase= FirebaseDatabase.getInstance().getReference("Debes")
+                .child(userId);
+
+        // Generar un ID único para la nueva deuda
+        String deudaId = mDatabase.push().getKey();
+
+        if (deudaId != null) {
+            Map<String, Object> nuevaDeuda = new HashMap<>();
+            nuevaDeuda.put("monto", monto);
+
+            mDatabase.child(deudaId).setValue(nuevaDeuda)
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(this, "Deuda agregada correctamente", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "Error al agregar la deuda", Toast.LENGTH_SHORT).show();
+                    });
+        }
+    }
+
+
+    private void calcularDeudaTotal() {
+        double deudaRestante = totalDeudas - totalPagos;
+
+        // Actualizar el TextView con la deuda restante
+        tvprogreso.setText(String.format("Deuda Total Restante: $%.2f", deudaRestante));
+
+        if (deudaRestante <= 0) {
+            confirmarReinicioMeta();
+        }
+
+    }
+
+
 }

@@ -90,6 +90,36 @@
                 android:textSize="16sp"
                 android:justificationMode="inter_word"/>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ingresar monto deuda"
+                android:textSize="18sp"
+                android:layout_marginBottom="8dp"
+                android:justificationMode="inter_word"/>
+
+            <EditText
+                android:id="@+id/et_deuda"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:inputType="numberDecimal"
+                />
+
+            <Button
+                android:id="@+id/btn_deuda"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ingresar monto"
+                android:backgroundTint="@color/secondary"
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="24dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvdeudatotal"
+                android:text="deuda actual:"
+                android:textSize="18sp"/>
             <!-- Campo para Tipo de Deuda -->
             <TextView
                 android:layout_width="wrap_content"
