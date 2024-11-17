@@ -103,8 +103,6 @@ public class EndeudamientoActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 
-        String Deuda = etDeuda.getText().toString();
-
         //loadSavedData();
         cargarDatosFirebase();
 
