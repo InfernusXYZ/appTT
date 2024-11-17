@@ -316,6 +316,7 @@ public class EndeudamientoActivity extends AppCompatActivity {
         etPagosMensuales.setText("");
         etTipoDeuda.setText("");
 
+        mDatabase = FirebaseDatabase.getInstance().getReference();
         mDatabase.child("Deudas").child(userID).push().setValue(DeudaMap).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
