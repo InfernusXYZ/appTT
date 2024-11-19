@@ -285,6 +285,7 @@ public class EndeudamientoActivity extends AppCompatActivity {
         initializeCharts();
         Toast.makeText(EndeudamientoActivity.this, "Historial y gráficas borradas", Toast.LENGTH_SHORT).show();
     }
+
     private void guardardeuda(){
         tipostr = etTipoDeuda.getText().toString();
         ingresosStr = etIngresosMensuales.getText().toString();
@@ -299,13 +300,19 @@ public class EndeudamientoActivity extends AppCompatActivity {
         double Ingresomensuales = Double.parseDouble(ingresosStr);
         double Pagomensuales = Double.parseDouble(pagosStr);
         double relacionEndeudamiento = (Pagomensuales / Ingresomensuales) * 100;
+
         if (Ingresomensuales <= Pagomensuales){
             Toast.makeText(this,"No puede ahorra mas de lo que gana", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        String userID = mAuth.getCurrentUser().getUid();
+        // Aquí verificamos si la relación de endeudamiento supera el umbral (30%)
+        if (relacionEndeudamiento > 30) {
+            mostrarAlertaExcesoDeuda(relacionEndeudamiento);
+        }
 
+        //guardar datos en firebase
+        String userID = mAuth.getCurrentUser().getUid();
         Map<String,Object> DeudaMap = new HashMap<>();
         DeudaMap.put("TipoDeuda", tipostr);
         DeudaMap.put("IngresoMensual",Ingresomensuales);
@@ -327,6 +334,16 @@ public class EndeudamientoActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    // Método para mostrar el AlertDialog si la relación de endeudamiento es mayor al 30%
+    private void mostrarAlertaExcesoDeuda(double relacionEndeudamiento) {
+        new AlertDialog.Builder(this)
+                .setTitle("¡Alerta! Relación de Endeudamiento Alta")
+                .setMessage("Tu relación de endeudamiento es del " + String.format("%.2f", relacionEndeudamiento) + "%, lo cual es mayor al 30%. Esto indica que una gran parte de tus ingresos está siendo utilizada para pagar deudas.\n\n" +
+                        "Para mejorar tu situación financiera, considera reducir tus deudas, aumentar tus ingresos o ajustar tus gastos. Mantener una relación de endeudamiento por debajo del 30% es ideal para asegurar tu estabilidad financiera.")
+                .setPositiveButton("Entendido", null)
+                .show();
     }
 
     private void cargarTotalesFirebaseYActualizarGraficas() {

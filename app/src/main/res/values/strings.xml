@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">appTT</string>
+    <string name="app_name">PoliWallet</string>
 
     <!-- Opciones para Categoría de Ingresos -->
     <string-array name="opciones_categoria_ingresos">
