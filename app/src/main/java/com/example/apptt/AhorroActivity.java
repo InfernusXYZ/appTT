@@ -492,6 +492,9 @@ public class AhorroActivity extends AppCompatActivity {
             return;
         }
 
+        // Mostrar el AlertDialog basado en el porcentaje de ahorro
+        mostrarAlertaPorcentajeAhorro(porcentajeAhorro);
+
         String userID = mAuth.getCurrentUser().getUid();
 
         Map<String,Object> AhorroMap = new HashMap<>();
@@ -506,11 +509,30 @@ public class AhorroActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()){
-                    Toast.makeText(AhorroActivity.this,"Ingreso guardado correctamente",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AhorroActivity.this,"Datos guardados correctamente",Toast.LENGTH_SHORT).show();
                 }else {
-                    Toast.makeText(AhorroActivity.this,"Error al guardar el ingreso",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AhorroActivity.this,"Error al guardar los datos",Toast.LENGTH_SHORT).show();
                 }
             }
         });
+    }
+
+    private void mostrarAlertaPorcentajeAhorro(double porcentajeAhorro) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(AhorroActivity.this);
+        builder.setTitle("Tasa de Ahorro");
+
+        // Verificar el rango del porcentaje y mostrar el mensaje adecuado
+        if (porcentajeAhorro >= 40) {
+            builder.setMessage("¡Felicidades! Estás ahorrando más del 40% de tus ingresos. ¡Sigue así!");
+        } else if (porcentajeAhorro >= 20 && porcentajeAhorro < 30) {
+            builder.setMessage("Tu tasa de ahorro es entre el 20% y el 30%. Intenta aumentar un poco más para mejorar tu estabilidad financiera.");
+        } else if (porcentajeAhorro >= 30 && porcentajeAhorro < 40) {
+            builder.setMessage("Tu tasa de ahorro es buena. Si continúas con este ritmo, lograrás tus metas de ahorro más rápido.");
+        } else {
+            builder.setMessage("Tu tasa de ahorro es baja. Intenta ahorrar un poco más cada mes. Revisa tus gastos y ve qué áreas puedes ajustar.");
+        }
+
+        builder.setPositiveButton("Ok", null);
+        builder.show();
     }
 }
