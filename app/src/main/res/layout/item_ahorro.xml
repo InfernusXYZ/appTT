@@ -3,8 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="8dp"
-    android:background="?attr/selectableItemBackground"
+    android:background="@drawable/row_background"
     >
     <TextView
         android:id="@+id/tvIngresoMensual"
@@ -12,17 +11,21 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="Ingreso Mensual"
-        android:background="#E3F2FD"
+        android:background="@color/columna1"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:padding="8dp"
         />
     <TextView
         android:id="@+id/tvAhorroMensual"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:background="#E8F5E9"
+        android:background="@color/columna2"
         android:text="Ahorro Mensual"
         android:gravity="center"
-        android:textStyle="bold"
+        android:textSize="12sp"
+        android:padding="8dp"
         />
     <TextView
         android:id="@+id/tvTasaAhorro"
@@ -30,7 +33,9 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="Tasa de Ahorro"
-        android:background="#FFFDE7"
-        android:gravity="end"
+        android:background="@color/columna3"
+        android:gravity="center"
+        android:padding="8dp"
+        android:textSize="12sp"
         />
 </LinearLayout>

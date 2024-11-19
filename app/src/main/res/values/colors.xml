@@ -16,4 +16,8 @@
     <color name="primary">#FBD228</color>
     <color name="secondary">#85122E</color>
     <color name="grey">#D0D5D7</color>
+    <color name="columna1">#E3F2FD</color>
+    <color name="columna2">#E8F5E9</color>
+    <color name="columna3">#FFFDE7</color>
+    <color name="columna4">#F3E5F5</color>
 </resources>

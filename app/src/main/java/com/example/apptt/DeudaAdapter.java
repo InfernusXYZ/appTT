@@ -26,7 +26,7 @@ public class DeudaAdapter extends RecyclerView.Adapter<DeudaAdapter.DeudaViewHol
         Deuda deuda = deudaList.get(position);
         holder.tvIngresomensual.setText("$"+String.valueOf(deuda.getIngresoMensual()));
         holder.tvPagomensual.setText("$"+String.valueOf(deuda.getPagoMensual()));
-        holder.tvTasaenedeudamiento.setText(String.valueOf(deuda.getRelaciondeendeudamiento())+"%");
+        holder.tvTasaenedeudamiento.setText(String.format("%.2f",deuda.getRelaciondeendeudamiento())+"%");
         holder.tvTipo.setText(deuda.getTipoDeuda());
     }
 

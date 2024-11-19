@@ -3,16 +3,19 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="8dp"
-    android:background="?attr/selectableItemBackground"
+    android:background="@drawable/row_background"
     >
     <TextView
         android:id="@+id/tvTipo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:padding="8dp"
         android:text="Tipo"
         android:textStyle="bold"
+        android:gravity="center"
+        android:textSize="12sp"
+        android:background="@color/columna1"
         />
     <TextView
         android:id="@+id/tvIngresos"
@@ -21,6 +24,9 @@
         android:layout_weight="1"
         android:text="Ingresos"
         android:gravity="center"
+        android:textSize="12sp"
+        android:padding="8dp"
+        android:background="@color/columna2"
         />
     <TextView
         android:id="@+id/tvPagos"
@@ -28,7 +34,10 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="Pagos"
+        android:padding="8dp"
+        android:textSize="12sp"
         android:gravity="center"
+        android:background="@color/columna3"
         />
     <TextView
         android:id="@+id/tvendeudaminento"
@@ -36,7 +45,10 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="endeudamiento"
-        android:gravity="left"
+        android:gravity="center"
+        android:padding="8dp"
+        android:textSize="12sp"
+        android:background="@color/columna4"
         />
 
 </LinearLayout>

@@ -26,7 +26,7 @@ public class AhorroAdapter extends RecyclerView.Adapter<AhorroAdapter.AhorroView
             Ahorro ahorro = ahorroList.get(position);
             holder.tvIngresomensual.setText("$"+String.valueOf(ahorro.getIngresoMensual()));
             holder.tvAhorromensual.setText("$"+String.valueOf(ahorro.getAhorroMensual()));
-            holder.tvTasaAhorro.setText(String.valueOf(ahorro.getTasaAhorro())+"%");
+            holder.tvTasaAhorro.setText(String.format("%.2f",ahorro.getTasaAhorro())+"%");
         }
 
         @Override

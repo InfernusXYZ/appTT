@@ -1,42 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@drawable/row_background"
+        android:background="@android:color/darker_gray"
         >
         <TextView
-            android:id="@+id/tvCategoria"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Categoria"
             android:background="@color/columna1"
+            android:text="Tipo"
             android:gravity="center"
-            android:textSize="12sp"
             android:padding="4dp"
             />
+
         <TextView
-            android:id="@+id/tvTipo"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Tipo"
+            android:text="Ingresos"
             android:background="@color/columna2"
             android:gravity="center"
-            android:textSize="12sp"
             android:padding="4dp"
             />
+
         <TextView
-            android:id="@+id/tvMonto"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Monto"
+            android:text="Pagos"
             android:background="@color/columna3"
             android:gravity="center"
-            android:textSize="12sp"
             android:padding="4dp"
             />
-    </LinearLayout>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Relacion"
+            android:background="@color/columna4"
+            android:gravity="center"
+            android:padding="4dp"
+            />
+
+</LinearLayout>

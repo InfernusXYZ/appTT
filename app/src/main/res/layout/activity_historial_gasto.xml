@@ -26,35 +26,10 @@
             android:layout_height="wrap_content"
             android:text="Regresar"
             />
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp"
-            >
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Categoria"
-                />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Tipo"
-                android:gravity="center"
-                />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Monto"
-                android:gravity="end"
-                />
-        </LinearLayout>
+        <include
+            android:id="@+id/header_gasto"
+            layout="@layout/header_ingreso"
+            />
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/HistorialGas"
             android:layout_width="match_parent"
