@@ -450,16 +450,15 @@ public class AhorroActivity extends AppCompatActivity {
     private void mostrarmensajeexito(){
         new AlertDialog.Builder(this)
                 .setTitle("Meta Alcanzada")
-                .setMessage("¿Estas seguro de que deseas reiniciar tu meta de ahorro?")
-                .setPositiveButton("Ok",(dialog, which) -> reiniciarMeta())
-                .setNegativeButton("Cancelar",null)
+                .setMessage("Favor de darle al boton reinicar meta y ahorros, para comenzar, con una nueva")
+                .setPositiveButton("Ok",null)
                 .show();
     }
 
     private void confirmarReinicioMeta(){
         new AlertDialog.Builder(this)
                 .setTitle("Reiniciar Meta")
-                .setMessage("¿Estas seguro de que deseas reiniciar tu meta de ahorro")
+                .setMessage("¿Estas seguro de que deseas reiniciar tu meta de ahorro y registro de ahorros previos")
                 .setPositiveButton("Si",(dialog, which) -> reiniciarMeta())
                 .setNegativeButton("Cancelar",null)
                 .show();

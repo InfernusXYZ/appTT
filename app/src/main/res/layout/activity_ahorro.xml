@@ -115,14 +115,6 @@
                 android:textColor="#FFFFFF"
                 android:layout_marginBottom="24dp"/>
 
-            <Button
-                android:id="@+id/btn_reiniciometa"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Reiniciar meta"
-                android:backgroundTint="@color/secondary"
-                android:textColor="#FFFFFF"
-                android:layout_marginBottom="24dp"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -309,6 +301,16 @@
                 android:textSize="12sp"
                 android:layout_marginBottom="24dp"/>
             </LinearLayout>
+
+
+            <Button
+                android:id="@+id/btn_reiniciometa"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Reiniciar meta y ahorros"
+                android:backgroundTint="@color/secondary"
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="24dp"/>
             <!-- Botón para borrar el historial -->
             <Button
                 android:id="@+id/btn_borrar_historial"
