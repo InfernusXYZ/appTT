@@ -124,14 +124,58 @@
                 android:textColor="#FFFFFF"
                 android:layout_marginBottom="24dp"/>
 
-
-            <TextView
-                android:id="@+id/tvprogresometa"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Ahorro Actual: "
-                />
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="16dp">
+                <TextView
+                    android:id="@+id/tvProgresoTexto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Progreso ahorro"
+                    android:textSize="18sp"
+                    android:layout_gravity="center_horizontal"
+                    android:paddingBottom="16dp"/>
+                <ProgressBar
+                    android:id="@+id/progressbarraahorro"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:progress="0"
+                    android:max="100"
+                    android:progressTint="@color/colorAccent"
+                    android:backgroundTint="@color/colorPrimaryDark"
+                    android:padding="8dp"/>
+                <TextView
+                    android:id="@+id/tvProgresoPorcentaje"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0%"
+                    android:textSize="16sp"
+                    android:layout_gravity="center_horizontal"
+                    android:paddingTop="8dp"
+                    />
+                <TextView
+                    android:id="@+id/tvMeta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Meta: $0"
+                    android:textSize="16sp"
+                    android:layout_gravity="center_horizontal"
+                    android:paddingTop="16dp"
+                    />
 
+                <TextView
+                    android:id="@+id/tvprogresometa"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ahorro Actual: $0"
+                    android:textSize="16sp"
+                    android:layout_gravity="center_horizontal"
+                    android:paddingTop="8dp"
+                    />
+            </LinearLayout>
 
             <!-- Sección de Ingresos Mensuales -->
             <TextView

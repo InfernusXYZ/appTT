@@ -1,5 +1,6 @@
 package com.example.apptt;
 
+import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -8,8 +9,10 @@ import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,7 +56,7 @@ import java.util.Map;
 public class AhorroActivity extends AppCompatActivity {
 
     private EditText etIngresosMensuales, etAhorroMensual, etmetaahorro;
-    private TextView tvHistorialAhorro, tvHistorialahorromen, tvHistorialporcentge, tvprogreso;
+    private TextView tvHistorialAhorro, tvHistorialahorromen, tvHistorialporcentge, tvprogreso, tvmeta, tvahorroAct, tvprogresotexto;
     private PieChart pieChart;
     private BarChart barChart;
     private List<String> historialList;
@@ -64,6 +67,7 @@ public class AhorroActivity extends AppCompatActivity {
     private double progresoAhorro = 0.0;
     private DatabaseReference metaRef, ahorroRef;
     private Button btnmeta, btnreinicio;
+    private ProgressBar progressBarahorro;
     private ValueEventListener metaListener;
     private ValueEventListener ahorrosListener;
     private boolean isListenerInitialized = false;
@@ -91,12 +95,16 @@ public class AhorroActivity extends AppCompatActivity {
         // Establece el SpannableString en el TextView
         textViewTitle.setText(spannableString);
 
+        progressBarahorro = findViewById(R.id.progressbarraahorro);
         etIngresosMensuales = findViewById(R.id.et_ingresos_mensuales);
         etAhorroMensual = findViewById(R.id.et_ahorro_mensual);
         etmetaahorro = findViewById(R.id.et_meta);
         tvHistorialAhorro = findViewById(R.id.tv_historial_ahorro);
         tvHistorialahorromen = findViewById(R.id.tv_historial_ahorro_men);
         tvHistorialporcentge = findViewById(R.id.tv_historial_porcentage);
+        tvprogresotexto = findViewById(R.id.tvProgresoTexto);
+        tvahorroAct = findViewById(R.id.tvProgresoPorcentaje);
+        tvmeta = findViewById(R.id.tvMeta);
         tvprogreso = findViewById(R.id.tvprogresometa);
         pieChart = findViewById(R.id.pieChart);
         barChart = findViewById(R.id.barChart);
@@ -382,7 +390,6 @@ public class AhorroActivity extends AppCompatActivity {
                         progresoAhorro += ahorro.getAhorroMensual();
                     }
                 }
-                verificarMeta();
                 actualizarprogreso();
             }
 
@@ -423,16 +430,20 @@ public class AhorroActivity extends AppCompatActivity {
     }
 
     private void actualizarprogreso(){
-        tvprogreso.setText("Progreso actual: "+ progresoAhorro +" / "+ metaAhorro);
+        int progreso = metaAhorro > 0?(int)((progresoAhorro/metaAhorro)*100):0;
+        progressBarahorro.setProgress(progreso);
 
-    }
+        ObjectAnimator progressanimator = ObjectAnimator.ofInt(progressBarahorro, "progress",0,progreso);
+        progressanimator.setDuration(500);
+        progressanimator.setInterpolator(new DecelerateInterpolator());
+        progressanimator.start();
 
-    private void verificarMeta(){
-        if (progresoAhorro >= metaAhorro && metaAhorro > 0){
-            metacumplida = true;
-            if(!isFinishing() && metacumplida == true) {
-                mostrarmensajeexito();
-            }
+        tvahorroAct.setText(progreso + "%");
+        tvmeta.setText("Meta: $" + metaAhorro);
+        tvprogreso.setText("Ahorro Actual: $"+ progresoAhorro);
+
+        if (progreso>=100){
+            mostrarmensajeexito();
         }
     }
 
