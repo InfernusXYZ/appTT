@@ -264,6 +264,16 @@
             </LinearLayout>
             <!-- Botón para borrar el historial -->
             <Button
+                android:id="@+id/btn_vaciar_historial"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Borrar Deuda actual y historial"
+                android:backgroundTint="@color/secondary"
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="24dp"/>
+
+
+            <Button
                 android:id="@+id/btn_borrar_historial"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

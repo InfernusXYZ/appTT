@@ -43,7 +43,7 @@ public class EndeudamientoActivity extends AppCompatActivity {
 
     private EditText etTipoDeuda, etIngresosMensuales, etPagosMensuales, etDeuda;
     private TextView tvprogreso,tvHistorialEndeudamiento, tvHistorialIngresos, tvHistorialGastos, tvHistorialrelacion;
-    private Button btnCalcular, btnBorrarHistorial, btnEnciclopedia, btnBalance, btnAhorros, btnEndeudamiento, btnDeuda;
+    private Button btnvaciar,btnCalcular, btnBorrarHistorial, btnEnciclopedia, btnBalance, btnAhorros, btnEndeudamiento, btnDeuda;
     private PieChart pieChart;
     private BarChart barChart;
     private String tipostr,pagosStr,ingresosStr;
@@ -91,6 +91,7 @@ public class EndeudamientoActivity extends AppCompatActivity {
         btnCalcular = findViewById(R.id.btn_calcular);
         btnDeuda = findViewById(R.id.btn_deuda);
         btnBorrarHistorial = findViewById(R.id.btn_borrar_historial);
+        btnvaciar = findViewById(R.id.btn_vaciar_historial);
         pieChart = findViewById(R.id.pieChartEndeudamiento);
         barChart = findViewById(R.id.barChartEndeudamiento);
 
@@ -115,6 +116,7 @@ public class EndeudamientoActivity extends AppCompatActivity {
 
         btnDeuda.setOnClickListener(view -> agregarDeudaAFirebase());
         btnCalcular.setOnClickListener(view -> guardardeuda());
+        btnvaciar.setOnClickListener(view -> confirmarReinicioDeuda());
         btnBorrarHistorial.setOnClickListener(view -> {
             Intent intent = new Intent(EndeudamientoActivity.this,DeudaHistorial.class);
             startActivity(intent);
@@ -403,11 +405,22 @@ public class EndeudamientoActivity extends AppCompatActivity {
         btnDeuda.setEnabled(true);
 
     }
+
+    private void confirmarReinicioDeuda(){
+        new AlertDialog.Builder(this)
+                .setTitle("Borrado de deudas actuales")
+                .setMessage("Seguro que desae eliminar la deuda actual, junto con los pagos realizador")
+                .setPositiveButton("Ok",((dialog, which) -> borrarHistorial()))
+                .setNegativeButton("Cancelar",null)
+                .show();
+
+    }
+
     private void confirmarReinicioMeta(){
         new AlertDialog.Builder(this)
                 .setTitle("Libre de deudas")
-                .setMessage("Felicidades las deudas fueron pagadas")
-                .setPositiveButton("Ok",((dialog, which) -> borrarHistorial()))
+                .setMessage("Felicidades las deudas fueron pagadas favor de presionar borrar deuda actual y historial para despedirte de tus deudas")
+                .setPositiveButton("Ok",null)
                 .show();
 
     }
