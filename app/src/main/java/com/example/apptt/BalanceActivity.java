@@ -1,5 +1,6 @@
 package com.example.apptt;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -52,6 +53,7 @@ public class BalanceActivity extends AppCompatActivity {
     private ArrayList<PieEntry> entries = new ArrayList<>();
     private HashMap<String, Double> ingresosPorCategoria = new HashMap<>();
     private HashMap<String, Double> gastosPorCategoria = new HashMap<>();
+    private DatabaseReference historialingreso,historialgasto;
 
     // Nuevas variables para el gráfico de ingresos por categoría
     private PieChart pieChartIngresos;
@@ -85,6 +87,10 @@ public class BalanceActivity extends AppCompatActivity {
 
         final TextView tvDescripcion1 = findViewById(R.id.tv_descripcion1);
         tvDescripcion1.setText("Durante este módulo se podrán ingresar los datos de los ingresos y los gastos que una persona cree o piensa tener durante un periodo de tiempo. Los datos se podrán visualizar mediante gráficos, un balance mensual al final y un historial con los datos ingresados.");
+
+        String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        historialingreso = FirebaseDatabase.getInstance().getReference("Ingresos").child(userID);
+        historialgasto = FirebaseDatabase.getInstance().getReference("Gastos").child(userID);
 
         // Inicializar SharedPreferences
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
@@ -299,49 +305,7 @@ public class BalanceActivity extends AppCompatActivity {
 
         // Manejar el botón para borrar el historial
         Button btnBorrarHistorial = findViewById(R.id.btn_borrar_historial);
-        btnBorrarHistorial.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Limpiar historial y resetear los totales
-                historial.setLength(0);
-                totalIngresos = 0.0;
-                totalGastos = 0.0;
-
-                // Limpiar los mapas de categorías
-                ingresosPorCategoria.clear();
-                gastosPorCategoria.clear();
-
-                // Actualizar el TextView para mostrar el historial vacío
-                tvHistorial.setText("0.00");
-                tvHistorialg.setText("0.00");
-
-                // Actualizar el balance a cero
-                actualizarBalance(tvBalanceMensual);
-
-                // Limpiar y actualizar todas las gráficas
-                entries.clear();
-                pieChart.clear();
-                pieChartIngresos.clear();
-                pieChartGastos.clear();
-
-                // Reconfigurar las gráficas vacías
-                //configurarGraficoPrincipal();
-                configurarGraficoIngresos();
-                configurarGraficoGastos();
-
-                // Forzar la actualización visual de las gráficas
-                pieChart.invalidate();
-                pieChartIngresos.invalidate();
-                pieChartGastos.invalidate();
-
-                // Limpiar completamente SharedPreferences
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.clear(); // Elimina todos los datos guardados
-                editor.apply();
-
-                Toast.makeText(BalanceActivity.this, "Historial y gráficas borradas", Toast.LENGTH_SHORT).show();
-            }
-        });
+        btnBorrarHistorial.setOnClickListener(view -> mostrarconfirmacionBorrado());
 
         // ---------- INICIA SECCIÓN DE NAVEGACIÓN ----------
 
@@ -615,14 +579,25 @@ public class BalanceActivity extends AppCompatActivity {
 
     // Modificar el método para borrar historial para incluir el reseteo del nuevo gráfico
     private void borrarHistorial() {
+        historialingreso.removeValue().addOnCompleteListener(task -> {
+            if (task.isSuccessful()){
+                Toast.makeText(BalanceActivity.this,"Historial ingresos borrados correctamente",Toast.LENGTH_SHORT).show();
+            }else {
+                Toast.makeText(BalanceActivity.this,"Error al borrar",Toast.LENGTH_SHORT).show();
+            }
+        });
+        historialgasto.removeValue().addOnCompleteListener(task -> {
+            if (task.isSuccessful()){
+                Toast.makeText(BalanceActivity.this,"Historial gastos borrados correctamente",Toast.LENGTH_SHORT).show();
+            }else {
+                Toast.makeText(BalanceActivity.this,"Error al borrar",Toast.LENGTH_SHORT).show();
+            }
+        });
         historial.setLength(0);
         totalIngresos = 0.0;
         totalGastos = 0.0;
         ingresosPorCategoria.clear();
 
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
-        editor.apply();
 
         actualizarGrafico();
         actualizarGraficoIngresos();
@@ -637,4 +612,12 @@ public class BalanceActivity extends AppCompatActivity {
         editor.apply();
     }
 
+    private void mostrarconfirmacionBorrado(){
+        new AlertDialog.Builder(this)
+                .setTitle("Borrar Historial")
+                .setMessage("¿Estas seguro de querer borrar los ingresos y gastos que has realizado hasta la fecha")
+                .setPositiveButton("Si",((dialog, which) -> borrarHistorial()))
+                .setNegativeButton("Cancelar",null)
+                .show();
+    }
 }
