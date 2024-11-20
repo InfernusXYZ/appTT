@@ -63,7 +63,7 @@ public class AhorroActivity extends AppCompatActivity {
     private List<String> historialahorro;
     private List<String> historialporcentaje;
     private double metaAhorro = 0.0;
-    private boolean metacumplida = false;
+    private boolean alertaMostrada = false;
     private double progresoAhorro = 0.0;
     private DatabaseReference metaRef, ahorroRef;
     private Button btnmeta, btnreinicio;
@@ -403,7 +403,7 @@ public class AhorroActivity extends AppCompatActivity {
     private void guardarmetaahorro(){
         String metainput =  etmetaahorro.getText().toString().trim();
         if (!metainput.isEmpty()){
-            metacumplida = false;
+            alertaMostrada = false;
             actualizarprogreso();
             metaAhorro = Double.parseDouble(metainput);
             metaRef.setValue(metaAhorro);
@@ -442,7 +442,8 @@ public class AhorroActivity extends AppCompatActivity {
         tvmeta.setText("Meta: $" + metaAhorro);
         tvprogreso.setText("Ahorro Actual: $"+ progresoAhorro);
 
-        if (progreso>=100){
+        if (progreso>=100 && !alertaMostrada){
+            alertaMostrada=true;
             mostrarmensajeexito();
         }
     }
@@ -451,7 +452,10 @@ public class AhorroActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setTitle("Meta Alcanzada")
                 .setMessage("Favor de darle al boton borrar meta y ahorros, para comenzar, con una nueva")
-                .setPositiveButton("Ok",null)
+                .setPositiveButton("Ok",(dialog, which) -> {
+                    alertaMostrada = false;
+                })
+                .setCancelable(false)
                 .show();
     }
 
@@ -469,7 +473,7 @@ public class AhorroActivity extends AppCompatActivity {
         ahorroRef.removeValue();
         metaRef.setValue(0.0);
         progresoAhorro = 0.0;
-        metacumplida = false;
+        alertaMostrada = false;
         metaAhorro = 0.0;
         activarEdicionMeta();
         actualizarprogreso();

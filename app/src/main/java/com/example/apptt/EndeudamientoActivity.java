@@ -49,6 +49,7 @@ public class EndeudamientoActivity extends AppCompatActivity {
     private String tipostr,pagosStr,ingresosStr;
     private double totalPagos = 0.0;
     private double totalDeudas = 0.0;
+    private boolean alertamostrada = false;
 
     // Variables para almacenar datos
     private SharedPreferences sharedPreferences;
@@ -420,7 +421,10 @@ public class EndeudamientoActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setTitle("Libre de deudas")
                 .setMessage("Felicidades las deudas fueron pagadas favor de presionar borrar deuda actual y historial para despedirte de tus deudas")
-                .setPositiveButton("Ok",null)
+                .setPositiveButton("Ok",(dialog, which) -> {
+                    alertamostrada= false;
+                })
+                .setCancelable(false)
                 .show();
 
     }
@@ -513,7 +517,8 @@ public class EndeudamientoActivity extends AppCompatActivity {
         // Actualizar el TextView con la deuda restante
         tvprogreso.setText(String.format("Deuda Total Restante: $%.2f", deudaRestante));
 
-        if (deudaRestante <= 0) {
+        if (deudaRestante <= 0 && !alertamostrada) {
+            alertamostrada = true;
             confirmarReinicioMeta();
         }
 
