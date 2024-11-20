@@ -57,7 +57,7 @@ public class EndeudamientoActivity extends AppCompatActivity {
     private static final String HISTORIAL_KEY2 = "historialI";
     private static final String HISTORIAL_KEY3 = "historialG";
     private static final String HISTORIAL_KEY4 = "historialR";
-    private DatabaseReference mDatabase, deudaRef;
+    private DatabaseReference mDatabase, deudaRef, historialdebe, historialdeuda;
     private FirebaseAuth mAuth;
 
 
@@ -101,6 +101,9 @@ public class EndeudamientoActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        String userID = mAuth.getCurrentUser().getUid();
+        historialdebe = FirebaseDatabase.getInstance().getReference("Debes").child(userID);
+        historialdeuda = FirebaseDatabase.getInstance().getReference("Deudas").child(userID);
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 
         //loadSavedData();
@@ -276,11 +279,23 @@ public class EndeudamientoActivity extends AppCompatActivity {
         tvHistorialIngresos.setText("Ingreso mensual:\n\n");
         tvHistorialGastos.setText("Pago mensual:\n\n");
         tvHistorialrelacion.setText("Relacion de endeudamiento\n\n");
-        // Limpiar SharedPreferences
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
-        editor.apply();
 
+        historialdeuda.removeValue().addOnCompleteListener(task ->{
+            if(task.isSuccessful()){
+                Toast.makeText(EndeudamientoActivity.this, "Historial borrados", Toast.LENGTH_SHORT).show();
+            }else {
+                Toast.makeText(EndeudamientoActivity.this, "Error al borrar historial", Toast.LENGTH_SHORT).show();
+            }
+        });
+        historialdebe.removeValue().addOnCompleteListener(task -> {
+            if (task.isSuccessful()){
+                Toast.makeText(EndeudamientoActivity.this, "Historial borradas", Toast.LENGTH_SHORT).show();
+            }else {
+                Toast.makeText(EndeudamientoActivity.this, "Error al borrar historial", Toast.LENGTH_SHORT).show();
+
+            }
+
+        });
         // Limpiar las gráficas
         initializeCharts();
         Toast.makeText(EndeudamientoActivity.this, "Historial y gráficas borradas", Toast.LENGTH_SHORT).show();
@@ -392,7 +407,7 @@ public class EndeudamientoActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setTitle("Libre de deudas")
                 .setMessage("Felicidades las deudas fueron pagadas")
-                .setPositiveButton("Ok",null)
+                .setPositiveButton("Ok",((dialog, which) -> borrarHistorial()))
                 .show();
 
     }
