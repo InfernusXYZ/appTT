@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.view.View;
@@ -442,9 +444,14 @@ public class AhorroActivity extends AppCompatActivity {
         tvmeta.setText("Meta: $" + metaAhorro);
         tvprogreso.setText("Ahorro Actual: $"+ progresoAhorro);
 
-        if (progreso>=100 && !alertaMostrada){
+        if (progreso>=100 && !alertaMostrada ){
             alertaMostrada=true;
-            mostrarmensajeexito();
+            new Handler(Looper.getMainLooper()).postDelayed(()->{
+                if(!isFinishing()){
+                    mostrarmensajeexito();
+                }
+            },300);
+
         }
     }
 
