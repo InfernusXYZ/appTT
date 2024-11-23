@@ -20,6 +20,16 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
+
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -49,6 +59,7 @@ public class BalanceActivity extends AppCompatActivity {
     private double totalGastos = 0.0;
     private double totalbalance = 0.0;
     private PieChart pieChart;
+    private BarChart barChart;
     private TextView tvHistorial, tvHistorialg,tvBalanceMensual;
     private ArrayList<PieEntry> entries = new ArrayList<>();
     private HashMap<String, Double> ingresosPorCategoria = new HashMap<>();
@@ -109,6 +120,8 @@ public class BalanceActivity extends AppCompatActivity {
         pieChart = findViewById(R.id.pie_chart);
         pieChart.setUsePercentValues(true);
         pieChart.getDescription().setEnabled(false);
+        barChart = findViewById(R.id.bar_chart);
+
        // actualizarGrafico();  // Inicializa el gráfico al iniciar la actividad
 
         //Inicializacion del nuevo gráfico de ingresos
@@ -373,6 +386,8 @@ public class BalanceActivity extends AppCompatActivity {
         pieChart.setCenterTextSize(16f);
         pieChart.animateY(1000);
 
+        configurarGraficoBarras(totalIngresos, totalGastos);
+
         ArrayList<PieEntry> entries = new ArrayList<>();
 
         // Verificar si hay datos de ingresos y gastos
@@ -399,6 +414,67 @@ public class BalanceActivity extends AppCompatActivity {
         pieChart.invalidate(); // Refrescar el gráfico
         totalbalance = totalIngresos - totalGastos;
         tvBalanceMensual.setText(String.format("$ %.2f",totalbalance));
+    }
+
+    private void configurarGraficoBarras(double totalIngresos, double totalGastos) {
+        barChart.setDrawBarShadow(false);
+        barChart.setDrawValueAboveBar(true);
+        barChart.getDescription().setEnabled(false);
+        barChart.setMaxVisibleValueCount(50);
+        barChart.setPinchZoom(false);
+        barChart.setDrawGridBackground(false);
+
+        // Configurar eje X
+        XAxis xAxis = barChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+        xAxis.setGranularity(1f);
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(new String[]{"Ingresos", "Gastos"}));
+
+        // Configurar eje Y izquierdo
+        YAxis leftAxis = barChart.getAxisLeft();
+        leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+        leftAxis.setSpaceTop(15f);
+        leftAxis.setAxisMinimum(0f);
+
+        // Deshabilitar eje Y derecho
+        barChart.getAxisRight().setEnabled(false);
+
+        // Crear las entradas de datos
+        ArrayList<BarEntry> entries = new ArrayList<>();
+        entries.add(new BarEntry(0f, (float) totalIngresos));
+        entries.add(new BarEntry(1f, (float) totalGastos));
+
+        BarDataSet set1;
+        if (barChart.getData() != null &&
+                barChart.getData().getDataSetCount() > 0) {
+            set1 = (BarDataSet) barChart.getData().getDataSetByIndex(0);
+            set1.setValues(entries);
+            barChart.getData().notifyDataChanged();
+            barChart.notifyDataSetChanged();
+        } else {
+            set1 = new BarDataSet(entries, "Balance General");
+            set1.setColors(new int[]{Color.rgb(64, 89, 128), Color.rgb(149, 165, 124)});
+
+            ArrayList<IBarDataSet> dataSets = new ArrayList<>();
+            dataSets.add(set1);
+
+            BarData data = new BarData(dataSets);
+            data.setValueTextSize(10f);
+            data.setBarWidth(0.9f);
+            data.setValueFormatter(new ValueFormatter() {
+                @Override
+                public String getFormattedValue(float value) {
+                    return String.format("$%.2f", value);
+                }
+            });
+
+            barChart.setData(data);
+        }
+
+        // Animar el gráfico
+        barChart.animateY(1000);
+        barChart.invalidate();
     }
 
     private void configurarGraficoIngresos() {
