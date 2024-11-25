@@ -209,31 +209,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:layout_marginBottom="24dp"/>
-
-            <!-- Historial -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Historial"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="16dp"/>
-
-
+            <!--
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-            <!-- TextView para mostrar el historial -->
-            <TextView
-                android:id="@+id/tv_historial_endeudamiento"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:background="#E3F2FD"
-                android:textSize="10sp"
-                android:layout_marginBottom="24dp"/>
+
+                <TextView
+                    android:id="@+id/tv_historial_endeudamiento"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:background="#E3F2FD"
+                    android:textSize="10sp"
+                    android:layout_marginBottom="24dp"/>
                 <TextView
                     android:id="@+id/tv_historial_ingmen"
                     android:layout_width="0dp"
@@ -262,6 +252,8 @@
                     android:textSize="10sp"
                     android:layout_marginBottom="24dp"/>
             </LinearLayout>
+            -->
+
             <!-- Botón para borrar el historial -->
             <Button
                 android:id="@+id/btn_vaciar_historial"
