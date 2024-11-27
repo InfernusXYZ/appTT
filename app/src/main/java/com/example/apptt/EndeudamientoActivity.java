@@ -45,7 +45,7 @@ import java.util.Map;
 public class EndeudamientoActivity extends AppCompatActivity {
 
     private EditText etTipoDeuda, etIngresosMensuales, etPagosMensuales, etDeuda;
-    private TextView tvprogreso,tvHistorialEndeudamiento, tvHistorialIngresos, tvHistorialGastos, tvHistorialrelacion;
+    private TextView tvprogreso;/*tvHistorialEndeudamiento, tvHistorialIngresos, tvHistorialGastos, tvHistorialrelacion;*/
     private Button btnvaciar,btnCalcular, btnBorrarHistorial, btnEnciclopedia, btnBalance, btnAhorros, btnEndeudamiento, btnDeuda;
     private PieChart pieChart;
     private BarChart barChart;
@@ -87,10 +87,10 @@ public class EndeudamientoActivity extends AppCompatActivity {
         etIngresosMensuales = findViewById(R.id.et_ingresos_mensuales);
         etPagosMensuales = findViewById(R.id.et_pagos_mensuales);
         etDeuda = findViewById(R.id.et_deuda);
-        tvHistorialEndeudamiento = findViewById(R.id.tv_historial_endeudamiento);
+        /*tvHistorialEndeudamiento = findViewById(R.id.tv_historial_endeudamiento);
         tvHistorialIngresos = findViewById(R.id.tv_historial_ingmen);
         tvHistorialGastos = findViewById(R.id.tv_historial_pagmen);
-        tvHistorialrelacion = findViewById(R.id.tv_historial_relacion);
+        tvHistorialrelacion = findViewById(R.id.tv_historial_relacion);*/
         tvprogreso = findViewById(R.id.tvdeudatotal);
         btnCalcular = findViewById(R.id.btn_calcular);
         btnDeuda = findViewById(R.id.btn_deuda);
@@ -176,10 +176,10 @@ public class EndeudamientoActivity extends AppCompatActivity {
         String historial2 = "$"+ingresosMensuales+"\n";
         String historial3 = "$"+pagosMensuales+"\n";
         String historial4 = relacionEndeudamiento+"%\n";
-        tvHistorialEndeudamiento.append(historial + "\n");
+        /*tvHistorialEndeudamiento.append(historial + "\n");
         tvHistorialIngresos.append(historial2 + "\n");
         tvHistorialGastos.append(historial3 + "\n");
-        tvHistorialrelacion.append(historial4 + "\n");
+        tvHistorialrelacion.append(historial4 + "\n");*/
 
 
         // Mostrar Toast con la relación de endeudamiento
@@ -261,10 +261,10 @@ public class EndeudamientoActivity extends AppCompatActivity {
 
     private void saveData() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(HISTORIAL_KEY, tvHistorialEndeudamiento.getText().toString());
+        /*editor.putString(HISTORIAL_KEY, tvHistorialEndeudamiento.getText().toString());
         editor.putString(HISTORIAL_KEY2, tvHistorialIngresos.getText().toString());
         editor.putString(HISTORIAL_KEY3, tvHistorialGastos.getText().toString());
-        editor.putString(HISTORIAL_KEY4, tvHistorialrelacion.getText().toString());
+        editor.putString(HISTORIAL_KEY4, tvHistorialrelacion.getText().toString());*/
         editor.apply();
     }
 
@@ -273,18 +273,18 @@ public class EndeudamientoActivity extends AppCompatActivity {
         String historial2 = sharedPreferences.getString(HISTORIAL_KEY2, "Ingreso mensual:\n\n");
         String historial3 = sharedPreferences.getString(HISTORIAL_KEY3, "Pago mensual:\n\n");
         String historial4= sharedPreferences.getString(HISTORIAL_KEY4, "Relacion de endeudamiento:\n\n");
-        tvHistorialEndeudamiento.setText(historial);
+        /*tvHistorialEndeudamiento.setText(historial);
         tvHistorialIngresos.setText(historial2);
         tvHistorialGastos.setText(historial3);
-        tvHistorialrelacion.setText(historial4);
+        tvHistorialrelacion.setText(historial4);*/
     }
 
     private void borrarHistorial() {
         // Borrar el historial
-        tvHistorialEndeudamiento.setText("Tipo:\n\n");
+        /*tvHistorialEndeudamiento.setText("Tipo:\n\n");
         tvHistorialIngresos.setText("Ingreso mensual:\n\n");
         tvHistorialGastos.setText("Pago mensual:\n\n");
-        tvHistorialrelacion.setText("Relacion de endeudamiento\n\n");
+        tvHistorialrelacion.setText("Relacion de endeudamiento\n\n");*/
 
         historialdeuda.removeValue().addOnCompleteListener(task ->{
             if(task.isSuccessful()){

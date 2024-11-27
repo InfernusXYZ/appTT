@@ -104,15 +104,15 @@ public class AhorroActivity extends AppCompatActivity {
         etIngresosMensuales = findViewById(R.id.et_ingresos_mensuales);
         etAhorroMensual = findViewById(R.id.et_ahorro_mensual);
         etmetaahorro = findViewById(R.id.et_meta);
-        tvHistorialAhorro = findViewById(R.id.tv_historial_ahorro);
+        /*tvHistorialAhorro = findViewById(R.id.tv_historial_ahorro);
         tvHistorialahorromen = findViewById(R.id.tv_historial_ahorro_men);
-        tvHistorialporcentge = findViewById(R.id.tv_historial_porcentage);
+        tvHistorialporcentge = findViewById(R.id.tv_historial_porcentage);*/
         tvprogresotexto = findViewById(R.id.tvProgresoTexto);
         tvahorroAct = findViewById(R.id.tvProgresoPorcentaje);
         tvmeta = findViewById(R.id.tvMeta);
         tvprogreso = findViewById(R.id.tvprogresometa);
         pieChart = findViewById(R.id.pieChart);
-        barChart = findViewById(R.id.barChart);
+        //barChart = findViewById(R.id.barChart);
         Button btnCalcular = findViewById(R.id.btn_calcular);
         Button btnBorrarHistorial = findViewById(R.id.btn_borrar_historial);
         Button btnEnciclopedia = findViewById(R.id.btn_enciclopedia);
@@ -281,13 +281,13 @@ public class AhorroActivity extends AppCompatActivity {
 
     private void actualizarGraficas(double totalIngresos, double totalAhorro) {
         List<PieEntry> pieEntries = new ArrayList<>();
-        List<BarEntry> barEntries = new ArrayList<>();
+        //List<BarEntry> barEntries = new ArrayList<>();
 
         if (totalIngresos > 0 || totalAhorro > 0) {
             pieEntries.add(new PieEntry((float) totalIngresos, "Ingresos"));
             pieEntries.add(new PieEntry((float) totalAhorro, "Ahorro"));
-            barEntries.add(new BarEntry(1, (float) totalIngresos));
-            barEntries.add(new BarEntry(2, (float) totalAhorro));
+            /*barEntries.add(new BarEntry(1, (float) totalIngresos));
+            barEntries.add(new BarEntry(2, (float) totalAhorro));*/
         }
 
         PieDataSet pieDataSet = new PieDataSet(pieEntries, "Distribución Total de Ingresos y Ahorro");
@@ -296,11 +296,11 @@ public class AhorroActivity extends AppCompatActivity {
         pieChart.setData(pieData);
         pieChart.invalidate(); // refrescar la gráfica
 
-        BarDataSet barDataSet = new BarDataSet(barEntries, "Total Ingresos y Ahorro");
+        /*BarDataSet barDataSet = new BarDataSet(barEntries, "Total Ingresos y Ahorro");
         barDataSet.setColors(new int[]{getResources().getColor(R.color.colorPrimaryDark), getResources().getColor(R.color.colorAccentLight)});
         BarData barData = new BarData(barDataSet);
         barChart.setData(barData);
-        barChart.invalidate(); // refrescar la gráfica
+        barChart.invalidate(); // refrescar la gráfica*/
     }
 
 
@@ -315,13 +315,13 @@ public class AhorroActivity extends AppCompatActivity {
         pieChart.invalidate(); // Actualizar gráfica
 
         // Inicializar gráfica de barras en blanco
-        ArrayList<BarEntry> barEntries = new ArrayList<>();
+        /*ArrayList<BarEntry> barEntries = new ArrayList<>();
         barEntries.add(new BarEntry(1, 0)); // Entrada inicial en blanco
         BarDataSet barDataSet = new BarDataSet(barEntries, ""); // Crear conjunto de datos
         barDataSet.setColors(new int[]{R.color.gray}, this); // Establecer color
         BarData barData = new BarData(barDataSet); // Crear datos para la gráfica de barras
         barChart.setData(barData); // Asignar datos a la gráfica de barras
-        barChart.invalidate(); // Actualizar gráfica
+        barChart.invalidate(); // Actualizar gráfica*/
     }
 
     private void saveHistorial() {

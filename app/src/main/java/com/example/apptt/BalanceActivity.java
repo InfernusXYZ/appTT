@@ -20,6 +20,16 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
+
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -48,7 +58,7 @@ public class BalanceActivity extends AppCompatActivity {
     private double totalIngresos = 0.0;
     private double totalGastos = 0.0;
     private double totalbalance = 0.0;
-    private PieChart pieChart;
+    private BarChart barChart;
     private TextView tvHistorial, tvHistorialg,tvBalanceMensual;
     private ArrayList<PieEntry> entries = new ArrayList<>();
     private HashMap<String, Double> ingresosPorCategoria = new HashMap<>();
@@ -105,10 +115,9 @@ public class BalanceActivity extends AppCompatActivity {
         historial.append(historialGuardado);
         tvHistorial.setText(historial.toString());
 
-        // Inicializar la gráfica de pastel del balance
-        pieChart = findViewById(R.id.pie_chart);
-        pieChart.setUsePercentValues(true);
-        pieChart.getDescription().setEnabled(false);
+        // Inicializar la gráfica de barras del balance
+        barChart = findViewById(R.id.bar_chart);
+
        // actualizarGrafico();  // Inicializa el gráfico al iniciar la actividad
 
         //Inicializacion del nuevo gráfico de ingresos
@@ -360,45 +369,71 @@ public class BalanceActivity extends AppCompatActivity {
 
 
     private void configurarGraficoPrincipal(double totalIngresos, double totalGastos) {
-        pieChart.setUsePercentValues(true);
-        pieChart.getDescription().setEnabled(false);
-        pieChart.setDrawHoleEnabled(true);
-        pieChart.setUsePercentValues(true);
-        pieChart.getDescription().setEnabled(false);
-        pieChart.setDrawHoleEnabled(true);
-        pieChart.setHoleColor(Color.WHITE);
-        pieChart.setTransparentCircleRadius(61f);
-        pieChart.setDrawCenterText(true);
-        pieChart.setCenterText("Balance Total");
-        pieChart.setCenterTextSize(16f);
-        pieChart.animateY(1000);
-
-        ArrayList<PieEntry> entries = new ArrayList<>();
-
-        // Verificar si hay datos de ingresos y gastos
-        if (totalIngresos > 0 || totalGastos > 0) {
-            if (totalIngresos > 0) {
-                entries.add(new PieEntry((float) totalIngresos, "Ingresos"));
-            }
-            if (totalGastos > 0) {
-                entries.add(new PieEntry((float) totalGastos, "Gastos"));
-            }
-        } else {
-            // Si no hay datos, mostrar un mensaje de "Sin datos"
-            entries.add(new PieEntry(1f, "Sin datos"));
-        }
-
-        // Configurar el conjunto de datos
-        PieDataSet dataSet = new PieDataSet(entries, "Resumen Financiero");
-        dataSet.setColors(ColorTemplate.COLORFUL_COLORS); // Usa una paleta de colores predefinida
-        dataSet.setValueTextSize(12f);
-        dataSet.setValueTextColor(Color.BLACK);
-
-        PieData pieData = new PieData(dataSet);
-        pieChart.setData(pieData);
-        pieChart.invalidate(); // Refrescar el gráfico
+        configurarGraficoBarras(totalIngresos, totalGastos);
         totalbalance = totalIngresos - totalGastos;
         tvBalanceMensual.setText(String.format("$ %.2f",totalbalance));
+    }
+
+    private void configurarGraficoBarras(double totalIngresos, double totalGastos) {
+        barChart.setDrawBarShadow(false);
+        barChart.setDrawValueAboveBar(true);
+        barChart.getDescription().setEnabled(false);
+        barChart.setMaxVisibleValueCount(50);
+        barChart.setPinchZoom(false);
+        barChart.setDrawGridBackground(false);
+
+        // Configurar eje X
+        XAxis xAxis = barChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+        xAxis.setGranularity(1f);
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(new String[]{"", ""})); // Etiquetas vacías porque usaremos barras individuales
+
+        // Configurar eje Y izquierdo
+        YAxis leftAxis = barChart.getAxisLeft();
+        leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+        leftAxis.setSpaceTop(15f);
+        leftAxis.setAxisMinimum(0f);
+
+        // Deshabilitar eje Y derecho
+        barChart.getAxisRight().setEnabled(false);
+
+        // Crear datasets separados para ingresos y gastos
+        ArrayList<BarEntry> ingressEntries = new ArrayList<>();
+        ingressEntries.add(new BarEntry(0f, (float) totalIngresos));
+
+        ArrayList<BarEntry> gastosEntries = new ArrayList<>();
+        gastosEntries.add(new BarEntry(1f, (float) totalGastos));
+
+        // Crear dataset para ingresos
+        BarDataSet ingressDataSet = new BarDataSet(ingressEntries, "Ingresos");
+        ingressDataSet.setColor(Color.rgb(200, 162, 200)); // Lila
+
+        // Crear dataset para gastos
+        BarDataSet gastosDataSet = new BarDataSet(gastosEntries, "Gastos");
+        gastosDataSet.setColor(Color.rgb(162, 200, 180)); // Verde
+
+        ArrayList<IBarDataSet> dataSets = new ArrayList<>();
+        dataSets.add(ingressDataSet);
+        dataSets.add(gastosDataSet);
+
+        BarData data = new BarData(dataSets);
+        data.setValueTextSize(10f);
+        data.setBarWidth(0.9f);
+        data.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return String.format("$%.2f", value);
+            }
+        });
+
+        barChart.setData(data);
+        barChart.getLegend().setEnabled(true); // Asegurarse de que la leyenda esté visible
+        barChart.getLegend().setTextSize(12f); // Tamaño del texto de la leyenda
+
+        // Animar el gráfico
+        barChart.animateY(1000);
+        barChart.invalidate();
     }
 
     private void configurarGraficoIngresos() {
@@ -433,7 +468,9 @@ public class BalanceActivity extends AppCompatActivity {
                 // Llamar al método para actualizar el gráfico después de cargar los datos
                 actualizarGraficoIngresos();
                 if (totalIngresos != 0.0 || dataSnapshot.getChildrenCount() == 0) {
-                    configurarGraficoPrincipal(totalIngresos, totalGastos);
+                    configurarGraficoBarras(totalIngresos, totalGastos);
+                    totalbalance = totalIngresos - totalGastos;
+                    tvBalanceMensual.setText(String.format("$ %.2f",totalbalance));
                 }
             }
 
@@ -475,7 +512,9 @@ public class BalanceActivity extends AppCompatActivity {
                 // Llamar al método para actualizar el gráfico después de cargar los datos
                 actualizarGraficoGastos();
                 if (totalGastos != 0.0 || dataSnapshot.getChildrenCount() == 0) {
-                    configurarGraficoPrincipal(totalIngresos, totalGastos);
+                    configurarGraficoBarras(totalIngresos, totalGastos);
+                    totalbalance = totalIngresos - totalGastos;
+                    tvBalanceMensual.setText(String.format("$ %.2f",totalbalance));
                 }
             }
 
@@ -538,7 +577,7 @@ public class BalanceActivity extends AppCompatActivity {
         tvHistorialg.setText("Gastos Totales\n\n"+String.format("$ %.2f", totalGastos));
     }
 
-    // En el método actualizarGrafico()
+    /*// En el método actualizarGrafico()
     private void actualizarGrafico() {
         pieChart.setUsePercentValues(true);
         pieChart.getDescription().setEnabled(false);
@@ -574,7 +613,7 @@ public class BalanceActivity extends AppCompatActivity {
         PieData pieData = new PieData(dataSet);
         pieChart.setData(pieData);
         pieChart.invalidate(); // Refrescar el gráfico
-    }
+    }*/
 
 
     // Modificar el método para borrar historial para incluir el reseteo del nuevo gráfico
@@ -599,7 +638,7 @@ public class BalanceActivity extends AppCompatActivity {
         ingresosPorCategoria.clear();
 
 
-        actualizarGrafico();
+        //actualizarGrafico();
         actualizarGraficoIngresos();
         actualizarGraficoGastos();
     }
