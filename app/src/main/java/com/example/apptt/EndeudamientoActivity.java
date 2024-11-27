@@ -250,12 +250,14 @@ public class EndeudamientoActivity extends AppCompatActivity {
         pieDataSet.setColors(new int[]{getResources().getColor(R.color.colorPrimary), getResources().getColor(R.color.colorAccent)});
         PieData pieData = new PieData(pieDataSet);
         pieChart.setData(pieData);
+        pieChart.setDrawEntryLabels(false);
         pieChart.invalidate(); // refrescar la gráfica
 
         BarDataSet barDataSet = new BarDataSet(barEntries, "Total Ingresos y Pagos");
         barDataSet.setColors(new int[]{getResources().getColor(R.color.colorPrimaryDark), getResources().getColor(R.color.colorAccentLight)});
         BarData barData = new BarData(barDataSet);
         barChart.setData(barData);
+
         barChart.invalidate(); // refrescar la gráfica
     }
 

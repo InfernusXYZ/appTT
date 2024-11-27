@@ -85,13 +85,7 @@
                 android:textSize="18sp" />
 
             <!-- Aquí podrás escribir el texto de la Descripción -->
-            <TextView
-                android:id="@+id/tv_descripcion"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:text="."
-                android:textSize="16sp" />
+
 
             <!-- Repetir Cuadro para cada concepto -->
             <LinearLayout

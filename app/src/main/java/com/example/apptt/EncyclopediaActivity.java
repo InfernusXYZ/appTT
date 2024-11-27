@@ -17,9 +17,9 @@ public class EncyclopediaActivity extends AppCompatActivity {
 
     private boolean[] isExpanded = new boolean[9]; // Controla el estado de expansión de cada cuadro
     private TextView tvDescripcion, tvtitulo;
-    private Handler handler;
+    /*private Handler handler;
     private Runnable runnable;
-    private int contador = 0;
+    private int contador = 0;*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +50,7 @@ public class EncyclopediaActivity extends AppCompatActivity {
         configurarCuadro(R.id.image_concept9, R.id.tv_concept_description9, 8);
 
         // Inicializar el TextView para la descripción de la introducción
-        tvtitulo = findViewById(R.id.tvtitulo);
+        /*tvtitulo = findViewById(R.id.tvtitulo);
         tvDescripcion = findViewById(R.id.tv_descripcion);
         handler = new Handler();
         runnable = new Runnable() {
@@ -60,7 +60,7 @@ public class EncyclopediaActivity extends AppCompatActivity {
                 handler.postDelayed(this, 10000);
             }
         };
-        handler.post(runnable);
+        handler.post(runnable);*/
 
 
         // Inicializar los botones
@@ -105,7 +105,7 @@ public class EncyclopediaActivity extends AppCompatActivity {
         });
     }
 
-    private void actualizarContenido(){
+    /*private void actualizarContenido(){
         contador++;
         String[] titulos= {"Consejo #1","Consejo #2","Consejo #3"};
         String[] descripciones={"Se recomienda una distribucion de 30% para uso propio, 30% para ahorro, 30% para invertir y 10% caridad(opcional), para tener un gran equilibrio en tus finanzas",
@@ -123,7 +123,7 @@ public class EncyclopediaActivity extends AppCompatActivity {
     protected void onDestroy(){
         super.onDestroy();
         handler.removeCallbacks(runnable);
-    }
+    }*/
 
 
     // Método para configurar cada cuadro con la funcionalidad de expansión

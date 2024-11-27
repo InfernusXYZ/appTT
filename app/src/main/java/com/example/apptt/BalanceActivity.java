@@ -387,7 +387,7 @@ public class BalanceActivity extends AppCompatActivity {
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(false);
         xAxis.setGranularity(1f);
-        xAxis.setValueFormatter(new IndexAxisValueFormatter(new String[]{"", ""})); // Etiquetas vacías porque usaremos barras individuales
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(new String[]{"", ""}));
 
         // Configurar eje Y izquierdo
         YAxis leftAxis = barChart.getAxisLeft();
@@ -546,6 +546,7 @@ public class BalanceActivity extends AppCompatActivity {
         dataSetIngresos.setValueTextColor(Color.BLACK);
 
         PieData pieDataIngresos = new PieData(dataSetIngresos);
+        pieChartIngresos.setDrawEntryLabels(false);
         pieChartIngresos.setData(pieDataIngresos);
         pieChartIngresos.invalidate(); // Refrescar el gráfico
         tvHistorial.setText("Ingresos Totales\n\n"+String.format("$ %.2f", totalIngresos));
@@ -567,12 +568,13 @@ public class BalanceActivity extends AppCompatActivity {
         }
 
         PieDataSet dataSetGastos = new PieDataSet(entriesGastos, "Categorías de Gastos");
-        dataSetGastos.setColors(ColorTemplate.MATERIAL_COLORS); // Usa colores predeterminados
+        dataSetGastos.setColors(ColorTemplate.MATERIAL_COLORS);
         dataSetGastos.setValueTextSize(12f);
         dataSetGastos.setValueTextColor(Color.BLACK);
 
         PieData pieDataGastos = new PieData(dataSetGastos);
         pieChartGastos.setData(pieDataGastos);
+        pieChartGastos.setDrawEntryLabels(false);
         pieChartGastos.invalidate(); // Refrescar el gráfico
         tvHistorialg.setText("Gastos Totales\n\n"+String.format("$ %.2f", totalGastos));
     }
