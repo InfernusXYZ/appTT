@@ -49,10 +49,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class AhorroActivity extends AppCompatActivity {
@@ -519,6 +522,7 @@ public class AhorroActivity extends AppCompatActivity {
         String userID = mAuth.getCurrentUser().getUid();
 
         Map<String,Object> AhorroMap = new HashMap<>();
+        AhorroMap.put("Fecha",obtenerfecha());
         AhorroMap.put("IngresoMensual",Ingresomensual);
         AhorroMap.put("AhorroMensual",Ahorromensual);
         AhorroMap.put("TasaAhorro",porcentajeAhorro);
@@ -555,5 +559,10 @@ public class AhorroActivity extends AppCompatActivity {
 
         builder.setPositiveButton("Ok", null);
         builder.show();
+    }
+    private String obtenerfecha(){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        Date date=new Date();
+        return dateFormat.format(date);
     }
 }

@@ -27,9 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HistorialGasto extends AppCompatActivity {
-    private RecyclerView recyclerViewHistorial;
-    private GastoAdapter gastoAdapter;
-    private List<Gasto> gastoList;
+    private RecyclerView recyclerViewHistorial, recyclerViewHistorialV;
+    private GastoAdapter gastoAdapter,gastoAdapterV;
+    private List<Gasto> gastoList,gastoListVariable;
     private Button btnReg;
 
     private DatabaseReference mDatabase;
@@ -49,6 +49,12 @@ public class HistorialGasto extends AppCompatActivity {
         gastoAdapter = new GastoAdapter(gastoList);
         recyclerViewHistorial.setAdapter(gastoAdapter);
 
+        recyclerViewHistorialV = findViewById(R.id.HistorialGasV);
+        recyclerViewHistorialV.setLayoutManager(new LinearLayoutManager(this));
+        gastoListVariable = new ArrayList<>();
+        gastoAdapterV = new GastoAdapter(gastoListVariable);
+        recyclerViewHistorialV.setAdapter(gastoAdapterV);
+
         cargarIngresosdesdeFirebase();
 
         btnReg = findViewById(R.id.btnhistorialR);
@@ -67,16 +73,24 @@ public class HistorialGasto extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 gastoList.clear();
+                gastoListVariable.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     Gasto gasto = snapshot.getValue(Gasto.class);
                     if (gasto != null) {
                         Log.d("HistorialGastos", "Gasto:" + gasto.getCategoria() +", "+ gasto.getTipo()+", "+gasto.getMonto());
-                        gastoList.add(gasto);
+                        if ("Fijo".equalsIgnoreCase(gasto.getTipo())) {
+                            gastoList.add(gasto);
+                        }
+                        // Agregar a la lista "Variable" si cumple la condición
+                        if ("Variable".equalsIgnoreCase(gasto.getTipo())) {
+                            gastoListVariable.add(gasto);
+                        }
                     }else{
                         Log.d("HistorialGastos","Ingreso nulo o error de mapeo");
                     }
                 }
                 gastoAdapter.notifyDataSetChanged();
+                gastoAdapterV.notifyDataSetChanged();
             }
 
             @Override

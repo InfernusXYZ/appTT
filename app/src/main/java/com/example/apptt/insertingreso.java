@@ -23,7 +23,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class insertingreso extends AppCompatActivity {
@@ -90,6 +93,7 @@ public class insertingreso extends AppCompatActivity {
         String userID = mAuth.getCurrentUser().getUid();
 
         Map<String,Object> ingresoMap = new HashMap<>();
+        ingresoMap.put("Fecha",obtenerfecha());
         ingresoMap.put("Categoria",categoria);
         ingresoMap.put("Tipo",tipo);
         ingresoMap.put("Monto",monto);
@@ -105,5 +109,11 @@ public class insertingreso extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private String obtenerfecha(){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        Date date=new Date();
+        return dateFormat.format(date);
     }
 }

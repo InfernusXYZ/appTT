@@ -27,6 +27,12 @@
             android:layout_height="wrap_content"
             android:text="Regresar"
             />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ingresos Fijos"
+            android:textStyle="bold"
+            android:gravity="center"/>
         <include
             android:id="@+id/header_ingreso"
             layout="@layout/header_ingreso"
@@ -35,6 +41,24 @@
             android:id="@+id/HistorialIng"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             />
-</LinearLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ingresos Variables"
+            android:textStyle="bold"
+            android:gravity="center"/>
+            <include
+                android:id="@+id/header_ingresoV"
+                layout="@layout/header_ingreso"
+                />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/HistorialIngV"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                />
+        </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

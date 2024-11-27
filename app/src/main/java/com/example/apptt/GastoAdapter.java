@@ -26,8 +26,8 @@ public class GastoAdapter extends RecyclerView.Adapter<GastoAdapter.GastoViewHol
     @Override
     public void onBindViewHolder(@NonNull GastoViewHolder holder, int position){
         Gasto gasto = gastoList.get(position);
+        holder.tvFecha.setText(gasto.getFecha());
         holder.tvCategoria.setText(gasto.getCategoria());
-        holder.tvTipo.setText(gasto.getTipo());
         holder.tvMonto.setText(String.valueOf(gasto.getMonto()));
     }
 
@@ -37,12 +37,12 @@ public class GastoAdapter extends RecyclerView.Adapter<GastoAdapter.GastoViewHol
     }
 
     public static class GastoViewHolder extends RecyclerView.ViewHolder{
-        TextView tvCategoria, tvTipo, tvMonto;
+        TextView tvCategoria, tvFecha, tvMonto;
 
         public GastoViewHolder(@NonNull View itemView){
             super(itemView);
+            tvFecha = itemView.findViewById(R.id.tvFecha);
             tvCategoria = itemView.findViewById(R.id.tvCategoria);
-            tvTipo = itemView.findViewById(R.id.tvTipo);
             tvMonto = itemView.findViewById(R.id.tvMonto);
         }
     }

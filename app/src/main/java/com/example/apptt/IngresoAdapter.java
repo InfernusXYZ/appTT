@@ -24,8 +24,8 @@ public class IngresoAdapter extends RecyclerView.Adapter<IngresoAdapter.IngresoV
     @Override
     public void onBindViewHolder(@NonNull IngresoViewHolder holder, int position){
         Ingreso ingreso = ingresoList.get(position);
+        holder.tvFecha.setText(ingreso.getFecha());
         holder.tvCategoria.setText(ingreso.getCategoria());
-        holder.tvTipo.setText(ingreso.getTipo());
         holder.tvMonto.setText(String.valueOf(ingreso.getMonto()));
     }
 
@@ -35,12 +35,12 @@ public class IngresoAdapter extends RecyclerView.Adapter<IngresoAdapter.IngresoV
     }
 
     public static class IngresoViewHolder extends RecyclerView.ViewHolder{
-        TextView tvCategoria, tvTipo, tvMonto;
+        TextView tvCategoria, tvFecha, tvMonto;
 
         public IngresoViewHolder(@NonNull View itemView){
             super(itemView);
+            tvFecha = itemView.findViewById(R.id.tvFecha);
             tvCategoria = itemView.findViewById(R.id.tvCategoria);
-            tvTipo = itemView.findViewById(R.id.tvTipo);
             tvMonto = itemView.findViewById(R.id.tvMonto);
         }
     }

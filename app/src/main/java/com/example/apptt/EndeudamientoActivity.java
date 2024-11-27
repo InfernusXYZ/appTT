@@ -34,9 +34,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class EndeudamientoActivity extends AppCompatActivity {
@@ -332,6 +335,7 @@ public class EndeudamientoActivity extends AppCompatActivity {
         //guardar datos en firebase
         String userID = mAuth.getCurrentUser().getUid();
         Map<String,Object> DeudaMap = new HashMap<>();
+        DeudaMap.put("Fecha",obtenerfecha());
         DeudaMap.put("TipoDeuda", tipostr);
         DeudaMap.put("IngresoMensual",Ingresomensuales);
         DeudaMap.put("PagoMensual",Pagomensuales);
@@ -498,6 +502,7 @@ public class EndeudamientoActivity extends AppCompatActivity {
 
         if (deudaId != null) {
             Map<String, Object> nuevaDeuda = new HashMap<>();
+            nuevaDeuda.put("Fecha",obtenerfecha());
             nuevaDeuda.put("monto", monto);
 
             mDatabase.child(deudaId).setValue(nuevaDeuda)
@@ -522,6 +527,12 @@ public class EndeudamientoActivity extends AppCompatActivity {
             confirmarReinicioMeta();
         }
 
+    }
+
+    private String obtenerfecha(){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        Date date=new Date();
+        return dateFormat.format(date);
     }
 
 

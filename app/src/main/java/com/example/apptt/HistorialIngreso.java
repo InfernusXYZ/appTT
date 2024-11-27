@@ -28,9 +28,9 @@ import java.util.List;
 
 public class HistorialIngreso extends AppCompatActivity {
 
-    private RecyclerView recyclerViewHistorial;
-    private IngresoAdapter ingresoAdapter;
-    private List<Ingreso> ingresoList;
+    private RecyclerView recyclerViewHistorial, recyclerViewHistorialV;
+    private IngresoAdapter ingresoAdapter, ingresoAdapterV;
+    private List<Ingreso> ingresoList, ingresoListVariable;
     private Button btnReg;
 
     private DatabaseReference mDatabase;
@@ -44,11 +44,19 @@ public class HistorialIngreso extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference("Ingresos").child(mAuth.getCurrentUser().getUid());
 
+        // Configuración del RecyclerView para todos los ingresos
         recyclerViewHistorial = findViewById(R.id.HistorialIng);
         recyclerViewHistorial.setLayoutManager(new LinearLayoutManager(this));
         ingresoList = new ArrayList<>();
         ingresoAdapter = new IngresoAdapter(ingresoList);
         recyclerViewHistorial.setAdapter(ingresoAdapter);
+
+        // Configuración del RecyclerView para ingresos tipo "Variable"
+        recyclerViewHistorialV = findViewById(R.id.HistorialIngV);
+        recyclerViewHistorialV.setLayoutManager(new LinearLayoutManager(this));
+        ingresoListVariable = new ArrayList<>();
+        ingresoAdapterV = new IngresoAdapter(ingresoListVariable);
+        recyclerViewHistorialV.setAdapter(ingresoAdapterV);
 
         cargarIngresosdesdeFirebase();
 
@@ -68,16 +76,24 @@ public class HistorialIngreso extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 ingresoList.clear();
+                ingresoListVariable.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     Ingreso ingreso = snapshot.getValue(Ingreso.class);
                     if (ingreso != null) {
-                        Log.d("HistorialIngresos", "Ingreso:" + ingreso.getCategoria() +", "+ ingreso.getTipo()+", "+ingreso.getMonto());
-                        ingresoList.add(ingreso);
+                        Log.d("HistorialIngresos", "Ingreso:" + ingreso.getFecha() +", "+ ingreso.getCategoria()+", "+ingreso.getMonto());
+                        if ("Fijo".equalsIgnoreCase(ingreso.getTipo())) {
+                            ingresoList.add(ingreso);
+                        }
+                        // Agregar a la lista "Variable" si cumple la condición
+                        if ("Variable".equalsIgnoreCase(ingreso.getTipo())) {
+                            ingresoListVariable.add(ingreso);
+                        }
                     }else{
                         Log.d("HistorialIngresos","Ingreso nulo o error de mapeo");
                     }
                 }
                 ingresoAdapter.notifyDataSetChanged();
+                ingresoAdapterV.notifyDataSetChanged();
             }
 
             @Override

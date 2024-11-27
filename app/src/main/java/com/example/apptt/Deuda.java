@@ -1,6 +1,7 @@
 package com.example.apptt;
 
 public class Deuda {
+    private String Fecha;
     private double IngresoMensual;
     private double PagoMensual;
     private double Relaciondeendeudamiento;
@@ -10,7 +11,8 @@ public class Deuda {
 
     }
 
-    public Deuda(double IngresoMensual, double PagoMensual, double Relaciondeendeudamiento, String TipoDeuda){
+    public Deuda(String Fecha,double IngresoMensual, double PagoMensual, double Relaciondeendeudamiento, String TipoDeuda){
+        this.Fecha = Fecha;
         this.IngresoMensual = IngresoMensual;
         this.PagoMensual = PagoMensual;
         this.Relaciondeendeudamiento = Relaciondeendeudamiento;
@@ -33,4 +35,5 @@ public class Deuda {
     public String getTipoDeuda() {
         return TipoDeuda;
     }
+    public String getFecha() {return Fecha;}
 }

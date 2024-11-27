@@ -26,6 +26,12 @@
             android:layout_height="wrap_content"
             android:text="Regresar"
             />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:text="Gastos Fijos"
+            android:gravity="center"/>
         <include
             android:id="@+id/header_gasto"
             layout="@layout/header_ingreso"
@@ -34,6 +40,23 @@
             android:id="@+id/HistorialGas"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_weight="1"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:text="Gastos Variables"
+            android:gravity="center"/>
+        <include
+            android:id="@+id/header_gasto"
+            layout="@layout/header_ingreso"
+            />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/HistorialGasV"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
             />
     </LinearLayout>
 

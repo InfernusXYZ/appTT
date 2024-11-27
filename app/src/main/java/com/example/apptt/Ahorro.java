@@ -1,6 +1,7 @@
 package com.example.apptt;
 
 public class Ahorro {
+    private String Fecha;
     private double AhorroMensual;
     private double IngresoMensual;
     private double TasaAhorro;
@@ -9,7 +10,8 @@ public class Ahorro {
 
     }
 
-    public Ahorro(double AhorroMensual, double IngresoMensual,double TasaAhorro){
+    public Ahorro(String Fecha,double AhorroMensual, double IngresoMensual,double TasaAhorro){
+        this.Fecha=Fecha;
         this.AhorroMensual = AhorroMensual;
         this.IngresoMensual = IngresoMensual;
         this.TasaAhorro = TasaAhorro;
@@ -38,4 +40,6 @@ public class Ahorro {
     public void  setTasaAhorro(){
         this.TasaAhorro = TasaAhorro;
     }
+
+    public String getFecha() {return Fecha;}
 }
