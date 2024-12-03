@@ -28,7 +28,9 @@
             android:id="@+id/btnhistorialR"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Regresar" />
+            android:text="Regresar"
+            android:backgroundTint="@color/secondary"
+            android:textColor="#FFFFFF"/>
 
         <!-- Primera tabla: Gastos Fijos -->
         <TextView
