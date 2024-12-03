@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
@@ -114,6 +115,7 @@ public class EndeudamientoActivity extends AppCompatActivity {
 
         //loadSavedData();
         cargarDatosFirebase();
+        cargarHistorial();
 
 
         initializeCharts();
@@ -581,5 +583,84 @@ public class EndeudamientoActivity extends AppCompatActivity {
         return dateFormat.format(date);
     }
 
+    private void cargarHistorial() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            Toast.makeText(this, "Usuario no autenticado.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String userId = user.getUid();
+        DatabaseReference debesRef = FirebaseDatabase.getInstance().getReference("Debes").child(userId);
+
+        debesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot debesSnapshot) {
+                List<String> conceptos = new ArrayList<>();
+                List<Double> montosOriginales = new ArrayList<>();
+                List<String> keys = new ArrayList<>();
+
+                for (DataSnapshot conceptoSnapshot : debesSnapshot.getChildren()) {
+                    String concepto = conceptoSnapshot.child("Concepto").getValue(String.class);
+                    Double monto = conceptoSnapshot.child("monto").getValue(Double.class);
+
+                    if (concepto != null && monto != null) {
+                        conceptos.add(concepto);
+                        montosOriginales.add(monto);
+                        keys.add(conceptoSnapshot.getKey());
+                    }
+                }
+
+                if (conceptos.isEmpty()) {
+                    Toast.makeText(EndeudamientoActivity.this, "No tienes conceptos en 'Debes'.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                DatabaseReference deudasRef = FirebaseDatabase.getInstance().getReference("Deudas").child(userId);
+                deudasRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot deudasSnapshot) {
+                        List<Double> montosRestantes = new ArrayList<>();
+
+                        for (int i = 0; i < conceptos.size(); i++) {
+                            String concepto = conceptos.get(i);
+                            double montoOriginal = montosOriginales.get(i);
+                            double sumaPagos = 0;
+
+                            for (DataSnapshot deudaSnapshot : deudasSnapshot.getChildren()) {
+                                String tipoDeuda = deudaSnapshot.child("TipoDeuda").getValue(String.class);
+                                Double pagoMensual = deudaSnapshot.child("PagoMensual").getValue(Double.class);
+
+                                if (tipoDeuda != null && tipoDeuda.equals(concepto)) {
+                                    sumaPagos += (pagoMensual != null) ? pagoMensual : 0;
+                                }
+                            }
+
+                            montosRestantes.add(montoOriginal - sumaPagos);
+                        }
+
+                        // Configura el RecyclerView con los datos obtenidos
+                        configurarRecyclerView(conceptos, montosRestantes, montosOriginales,keys);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(EndeudamientoActivity.this, "Error al cargar deudas.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(EndeudamientoActivity.this, "Error al cargar conceptos de 'Debes'.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void configurarRecyclerView(List<String> conceptos, List<Double> montosRestantes, List<Double> montosOriginales, List<String>keys) {
+        RecyclerView recyclerView = findViewById(R.id.recyclerViewDebes);
+        ProgressAdapter adapter = new ProgressAdapter(this,conceptos, montosRestantes, montosOriginales,keys);
+        recyclerView.setAdapter(adapter);
+    }
 
 }

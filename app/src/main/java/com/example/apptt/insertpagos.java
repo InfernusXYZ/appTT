@@ -167,7 +167,7 @@ public class insertpagos extends AppCompatActivity {
                     return;
                 }
                 double montoingresado = Double.parseDouble(montopagos);
-                if(montoingresado > progresoRestante){
+                if(montoingresado <= progresoRestante){
                     guardardeuda();
                 }else{
                     Toast.makeText(getApplicationContext(),"No debes pagar mas de lo que debes",Toast.LENGTH_SHORT).show();
