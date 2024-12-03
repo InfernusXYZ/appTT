@@ -99,7 +99,7 @@ public class EndeudamientoActivity extends AppCompatActivity {
         btnBorrarHistorial = findViewById(R.id.btn_borrar_historial);
         btnvaciar = findViewById(R.id.btn_vaciar_historial);
         pieChart = findViewById(R.id.pieChartEndeudamiento);
-        barChart = findViewById(R.id.barChartEndeudamiento);
+        // barChart = findViewById(R.id.barChartEndeudamiento);
 
         btnEnciclopedia = findViewById(R.id.btn_enciclopedia);
         btnBalance = findViewById(R.id.btn_balance);
@@ -254,24 +254,24 @@ public class EndeudamientoActivity extends AppCompatActivity {
         pieChart.invalidate();
 
         // Inicializar gráfica de barras en blanco
-        ArrayList<BarEntry> barEntries = new ArrayList<>();
+       /* ArrayList<BarEntry> barEntries = new ArrayList<>();
         barEntries.add(new BarEntry(1, 0));
         BarDataSet barDataSet = new BarDataSet(barEntries, "");
         barDataSet.setColors(new int[]{R.color.gray}, this);
         BarData barData = new BarData(barDataSet);
         barChart.setData(barData);
-        barChart.invalidate();
+        barChart.invalidate();*/
     }
 
     private void actualizarGraficas(double totalIngresos, double totalPagos) {
         List<PieEntry> pieEntries = new ArrayList<>();
-        List<BarEntry> barEntries = new ArrayList<>();
+        //List<BarEntry> barEntries = new ArrayList<>();
 
         if (totalIngresos > 0 || totalPagos > 0) {
             pieEntries.add(new PieEntry((float) totalIngresos, "Ingresos"));
             pieEntries.add(new PieEntry((float) totalPagos, "Pagos"));
-            barEntries.add(new BarEntry(1, (float) totalIngresos));
-            barEntries.add(new BarEntry(2, (float) totalPagos));
+            //barEntries.add(new BarEntry(1, (float) totalIngresos));
+            //barEntries.add(new BarEntry(2, (float) totalPagos));
         }
 
         PieDataSet pieDataSet = new PieDataSet(pieEntries, "Distribución Total de Ingresos y Pagos");
@@ -281,12 +281,12 @@ public class EndeudamientoActivity extends AppCompatActivity {
         pieChart.setDrawEntryLabels(false);
         pieChart.invalidate(); // refrescar la gráfica
 
-        BarDataSet barDataSet = new BarDataSet(barEntries, "Total Ingresos y Pagos");
+        /*BarDataSet barDataSet = new BarDataSet(barEntries, "Total Ingresos y Pagos");
         barDataSet.setColors(new int[]{getResources().getColor(R.color.colorPrimaryDark), getResources().getColor(R.color.colorAccentLight)});
         BarData barData = new BarData(barDataSet);
         barChart.setData(barData);
 
-        barChart.invalidate(); // refrescar la gráfica
+        barChart.invalidate(); // refrescar la gráfica */
     }
 
     private void saveData() {
