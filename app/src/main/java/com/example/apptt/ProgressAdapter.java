@@ -124,7 +124,7 @@ public class ProgressAdapter extends RecyclerView.Adapter<ProgressAdapter.Progre
 
                     Toast.makeText(context, "Registro eliminado correctamente.", Toast.LENGTH_SHORT).show();
                 })
-                .addOnFailureListener(e -> Toast.makeText(context, "Error al eliminar el registro en 'Debes'.", Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> Toast.makeText(context, "Error al eliminar el registro en 'Deber'.", Toast.LENGTH_SHORT).show());
     }
 
     private void eliminarRegistrosDeudas(String conceptoEliminado) {
