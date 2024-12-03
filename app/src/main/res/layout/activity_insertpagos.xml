@@ -23,6 +23,8 @@
             android:layout_height="wrap_content"
             android:text="Regresar"
             android:layout_gravity="left"
+            android:backgroundTint="@color/secondary"
+            android:textColor="#FFFFFF"
             />
     <!-- Campo para Tipo de Deuda -->
     <TextView
