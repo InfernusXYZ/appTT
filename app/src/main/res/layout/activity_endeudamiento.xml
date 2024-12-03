@@ -89,7 +89,21 @@
                 android:text="Durante este módulo, podrás realizar el cálculo de la relación de endeudamiento con un tipo de deuda, así como visualizar de manera gráfica la distribución porcentual de la misma y el historial con los datos ingresados."
                 android:textSize="16sp"
                 android:justificationMode="inter_word"/>
-
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Concepto de deuda"
+                android:textSize="18sp"
+                android:layout_marginBottom="8dp"
+                android:justificationMode="inter_word"
+                />
+            <EditText
+                android:id="@+id/et_conceptdeuda"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="18dp"
+                android:inputType="text"
+                />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -119,9 +133,10 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/tvdeudatotal"
                 android:text="deuda actual:"
-                android:textSize="18sp"/>
+                android:textSize="18sp"
+                android:layout_marginBottom="15dp"/>
             <!-- Campo para Tipo de Deuda -->
-            <TextView
+            <!--<TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tipo de Deuda"
@@ -134,10 +149,10 @@
                 android:layout_height="wrap_content"
                 android:inputType="text"
                 android:hint="Ingrese el tipo de deuda (Nombre)"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="16dp"/>-->
 
             <!-- Campo para Ingresos Mensuales -->
-            <TextView
+            <!--<TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Ingresos Mensuales Totales"
@@ -150,10 +165,10 @@
                 android:layout_height="wrap_content"
                 android:inputType="numberDecimal"
                 android:hint="Ingrese sus ingresos mensuales totales"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="16dp"/> -->
 
             <!-- Campo para Pagos Mensuales -->
-            <TextView
+            <!--<TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Pagos Mensuales Totales"
@@ -166,14 +181,14 @@
                 android:layout_height="wrap_content"
                 android:inputType="numberDecimal"
                 android:hint="Ingrese sus pagos mensuales totales"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="16dp"/> -->
 
             <!-- Botón para calcular -->
             <Button
                 android:id="@+id/btn_calcular"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Calcular"
+                android:text="Ingresar Pago"
                 android:backgroundTint="@color/secondary"
                 android:textColor="#FFFFFF"
                 android:layout_marginBottom="24dp"/>

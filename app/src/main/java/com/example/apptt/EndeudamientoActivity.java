@@ -44,7 +44,7 @@ import java.util.Map;
 
 public class EndeudamientoActivity extends AppCompatActivity {
 
-    private EditText etTipoDeuda, etIngresosMensuales, etPagosMensuales, etDeuda;
+    private EditText etTipoDeuda, etIngresosMensuales, etPagosMensuales, etDeuda, etConcepto;
     private TextView tvprogreso;/*tvHistorialEndeudamiento, tvHistorialIngresos, tvHistorialGastos, tvHistorialrelacion;*/
     private Button btnvaciar,btnCalcular, btnBorrarHistorial, btnEnciclopedia, btnBalance, btnAhorros, btnEndeudamiento, btnDeuda;
     private PieChart pieChart;
@@ -83,10 +83,11 @@ public class EndeudamientoActivity extends AppCompatActivity {
         // Establece el SpannableString en el TextView
         textViewTitle.setText(spannableString);
 
-        etTipoDeuda = findViewById(R.id.et_tipo_deuda);
-        etIngresosMensuales = findViewById(R.id.et_ingresos_mensuales);
-        etPagosMensuales = findViewById(R.id.et_pagos_mensuales);
+        //etTipoDeuda = findViewById(R.id.et_tipo_deuda);
+        //etIngresosMensuales = findViewById(R.id.et_ingresos_mensuales);
+        //etPagosMensuales = findViewById(R.id.et_pagos_mensuales);
         etDeuda = findViewById(R.id.et_deuda);
+        etConcepto = findViewById(R.id.et_conceptdeuda);
         /*tvHistorialEndeudamiento = findViewById(R.id.tv_historial_endeudamiento);
         tvHistorialIngresos = findViewById(R.id.tv_historial_ingmen);
         tvHistorialGastos = findViewById(R.id.tv_historial_pagmen);
@@ -119,7 +120,32 @@ public class EndeudamientoActivity extends AppCompatActivity {
         cargarTotalesFirebaseYActualizarGraficas();
 
         btnDeuda.setOnClickListener(view -> agregarDeudaAFirebase());
-        btnCalcular.setOnClickListener(view -> guardardeuda());
+        btnCalcular.setOnClickListener(view -> {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if(user == null){
+                Toast.makeText(this,"Usuario no identificado", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            DatabaseReference debesref =FirebaseDatabase.getInstance().getReference("Debes").child(user.getUid());
+            debesref.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()&&snapshot.hasChildren()){
+                        Intent intent = new Intent(EndeudamientoActivity.this,insertpagos.class);
+                        startActivity(intent);
+                        finish();
+                    }else{
+                        Toast.makeText(getApplicationContext(),"Para meter un pago primero debe haber un registro",Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Toast.makeText(getApplicationContext(),"Error al verificar los registros",Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        });
         btnvaciar.setOnClickListener(view -> confirmarReinicioDeuda());
         btnBorrarHistorial.setOnClickListener(view -> {
             Intent intent = new Intent(EndeudamientoActivity.this,DeudaHistorial.class);
@@ -489,6 +515,7 @@ public class EndeudamientoActivity extends AppCompatActivity {
 
     private void agregarDeudaAFirebase() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String concepto = String.valueOf(etConcepto.getText());
         String metainput =  etDeuda.getText().toString().trim();
         Double monto = Double.parseDouble(metainput);
         if (user == null) return;
@@ -497,22 +524,39 @@ public class EndeudamientoActivity extends AppCompatActivity {
         mDatabase= FirebaseDatabase.getInstance().getReference("Debes")
                 .child(userId);
 
-        // Generar un ID único para la nueva deuda
-        String deudaId = mDatabase.push().getKey();
+        mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                long totaldeudas = snapshot.getChildrenCount();
+                if (totaldeudas >= 5){
+                    Toast.makeText(getApplicationContext(),"Antes de meter mas deudas termian las actuales",Toast.LENGTH_SHORT).show();
+                }else{
+                    // Generar un ID único para la nueva deuda
+                    String deudaId = mDatabase.push().getKey();
 
-        if (deudaId != null) {
-            Map<String, Object> nuevaDeuda = new HashMap<>();
-            nuevaDeuda.put("Fecha",obtenerfecha());
-            nuevaDeuda.put("monto", monto);
+                    if (deudaId != null) {
+                        Map<String, Object> nuevaDeuda = new HashMap<>();
+                        nuevaDeuda.put("Fecha",obtenerfecha());
+                        nuevaDeuda.put("Concepto",concepto);
+                        nuevaDeuda.put("monto", monto);
 
-            mDatabase.child(deudaId).setValue(nuevaDeuda)
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(this, "Deuda agregada correctamente", Toast.LENGTH_SHORT).show();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Error al agregar la deuda", Toast.LENGTH_SHORT).show();
-                    });
-        }
+                        mDatabase.child(deudaId).setValue(nuevaDeuda)
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(getApplicationContext(), "Deuda agregada correctamente", Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(getApplicationContext(), "Error al agregar la deuda", Toast.LENGTH_SHORT).show();
+                                });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getApplicationContext(),"Error al acceder a la base de datos",Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
 

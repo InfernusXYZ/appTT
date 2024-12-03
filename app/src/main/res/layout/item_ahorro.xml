@@ -6,13 +6,23 @@
     android:background="@drawable/row_background"
     >
     <TextView
+        android:id="@+id/tvFecha"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@color/columna2"
+        android:text="Ahorro Mensual"
+        android:gravity="center"
+        android:textSize="10sp"
+        android:padding="8dp"/>
+    <TextView
         android:id="@+id/tvIngresoMensual"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="Ingreso Mensual"
         android:background="@color/columna1"
-        android:textSize="12sp"
+        android:textSize="10sp"
         android:gravity="center"
         android:padding="8dp"
         />
@@ -24,7 +34,7 @@
         android:background="@color/columna2"
         android:text="Ahorro Mensual"
         android:gravity="center"
-        android:textSize="12sp"
+        android:textSize="10sp"
         android:padding="8dp"
         />
     <TextView
@@ -36,6 +46,6 @@
         android:background="@color/columna3"
         android:gravity="center"
         android:padding="8dp"
-        android:textSize="12sp"
+        android:textSize="10sp"
         />
 </LinearLayout>

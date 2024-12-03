@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".insertpagos">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="60dp"
+        android:layout_marginBottom="72dp">
+
+        <Button
+            android:id="@+id/btn_regresarP"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Regresar"
+            android:layout_gravity="left"
+            />
+    <!-- Campo para Tipo de Deuda -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Deudas"
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp"/>
+
+    <Spinner
+        android:id="@+id/Spinner_deudas"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:spinnerMode="dropdown"
+        android:layout_margin="16dp"
+        />
+
+        <TextView
+            android:id="@+id/tvprogresodeuda"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"/>
+
+    <!-- Campo para Ingresos Mensuales -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ingresos Mensuales Totales"
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp"/>
+
+    <EditText
+        android:id="@+id/et_ingresos_mensuales"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:hint="Ingrese sus ingresos mensuales totales"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Campo para Pagos Mensuales -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pagos Mensuales Totales"
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp"/>
+
+    <EditText
+        android:id="@+id/et_pagos_mensuales"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:hint="Ingrese sus pagos mensuales totales"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Botón para calcular -->
+    <Button
+        android:id="@+id/btn_Agregar_pago"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Agregar Pago"
+        android:backgroundTint="@color/secondary"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="24dp"/>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

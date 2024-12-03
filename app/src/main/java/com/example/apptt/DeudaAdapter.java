@@ -24,7 +24,7 @@ public class DeudaAdapter extends RecyclerView.Adapter<DeudaAdapter.DeudaViewHol
     @Override
     public void onBindViewHolder(@NonNull DeudaViewHolder holder, int position){
         Deuda deuda = deudaList.get(position);
-        holder.tvIngresomensual.setText("$"+String.valueOf(deuda.getIngresoMensual()));
+        holder.tvIngresomensual.setText(deuda.getFecha());
         holder.tvPagomensual.setText("$"+String.valueOf(deuda.getPagoMensual()));
         holder.tvTasaenedeudamiento.setText(String.format("%.2f",deuda.getRelaciondeendeudamiento())+"%");
         holder.tvTipo.setText(deuda.getTipoDeuda());

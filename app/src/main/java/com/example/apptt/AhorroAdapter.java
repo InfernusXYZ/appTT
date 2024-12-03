@@ -24,6 +24,7 @@ public class AhorroAdapter extends RecyclerView.Adapter<AhorroAdapter.AhorroView
         @Override
         public void onBindViewHolder(@NonNull AhorroViewHolder holder, int position){
             Ahorro ahorro = ahorroList.get(position);
+            holder.tvFecha.setText(ahorro.getFecha());
             holder.tvIngresomensual.setText("$"+String.valueOf(ahorro.getIngresoMensual()));
             holder.tvAhorromensual.setText("$"+String.valueOf(ahorro.getAhorroMensual()));
             holder.tvTasaAhorro.setText(String.format("%.2f",ahorro.getTasaAhorro())+"%");
@@ -35,10 +36,11 @@ public class AhorroAdapter extends RecyclerView.Adapter<AhorroAdapter.AhorroView
         }
 
         public static class AhorroViewHolder extends RecyclerView.ViewHolder{
-            TextView tvIngresomensual, tvAhorromensual, tvTasaAhorro;
+            TextView tvIngresomensual, tvAhorromensual, tvTasaAhorro,tvFecha;
 
             public AhorroViewHolder(@NonNull View itemView){
                 super(itemView);
+                tvFecha = itemView.findViewById(R.id.tvFecha);
                 tvIngresomensual = itemView.findViewById(R.id.tvIngresoMensual);
                 tvAhorromensual = itemView.findViewById(R.id.tvAhorroMensual);
                 tvTasaAhorro = itemView.findViewById(R.id.tvTasaAhorro);

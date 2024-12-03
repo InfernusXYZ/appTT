@@ -6,7 +6,7 @@
     android:background="@drawable/row_background"
     >
     <TextView
-        android:id="@+id/tvTipo"
+        android:id="@+id/tvIngresos"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -18,13 +18,13 @@
         android:background="@color/columna1"
         />
     <TextView
-        android:id="@+id/tvIngresos"
+        android:id="@+id/tvTipo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="Ingresos"
         android:gravity="center"
-        android:textSize="12sp"
+        android:textSize="10sp"
         android:padding="8dp"
         android:background="@color/columna2"
         />
