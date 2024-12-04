@@ -334,6 +334,9 @@ public class EndeudamientoActivity extends AppCompatActivity {
         });
         // Limpiar las gráficas
         initializeCharts();
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
         Toast.makeText(EndeudamientoActivity.this, "Historial y gráficas borradas", Toast.LENGTH_SHORT).show();
     }
 
@@ -528,9 +531,13 @@ public class EndeudamientoActivity extends AppCompatActivity {
         mDatabase= FirebaseDatabase.getInstance().getReference("Debes")
                 .child(userId);
 
-        mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+        mDatabase.orderByChild("Concepto").equalTo(concepto).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    Toast.makeText(EndeudamientoActivity.this,"Este concepto ya existe",Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 long totaldeudas = snapshot.getChildrenCount();
                 if (totaldeudas >= 5){
                     Toast.makeText(getApplicationContext(),"Antes de meter mas deudas termian las actuales",Toast.LENGTH_SHORT).show();
@@ -547,6 +554,9 @@ public class EndeudamientoActivity extends AppCompatActivity {
                         mDatabase.child(deudaId).setValue(nuevaDeuda)
                                 .addOnSuccessListener(aVoid -> {
                                     Toast.makeText(getApplicationContext(), "Deuda agregada correctamente", Toast.LENGTH_SHORT).show();
+                                    Intent intent = getIntent();
+                                    finish();
+                                    startActivity(intent);
                                 })
                                 .addOnFailureListener(e -> {
                                     Toast.makeText(getApplicationContext(), "Error al agregar la deuda", Toast.LENGTH_SHORT).show();
