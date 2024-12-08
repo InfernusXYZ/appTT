@@ -21,6 +21,7 @@
         <item>Comida</item>
         <item>Transporte</item>
         <item>Entretenimiento</item>
+        <item>Otros Gastos</item>
     </string-array>
 
     <!-- Opciones para Tipo de Gastos -->
