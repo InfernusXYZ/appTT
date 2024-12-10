@@ -90,7 +90,7 @@ public class AhorroActivity extends AppCompatActivity {
 
         //Colores en titulo
         TextView textViewTitle = findViewById(R.id.textViewTitle);
-        String text = "Polliwallet";
+        String text = "Poliwallet";
         // Crea un SpannableString
         SpannableString spannableString = new SpannableString(text);
         // Aplica el color "secondary" para "Poli"

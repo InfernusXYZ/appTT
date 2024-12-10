@@ -19,7 +19,7 @@
             android:id="@+id/textViewTitle3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Polliwallet"
+            android:text="Poliwallet"
             android:textSize="24sp"
             android:layout_marginBottom="4dp"
             android:gravity="center"/>

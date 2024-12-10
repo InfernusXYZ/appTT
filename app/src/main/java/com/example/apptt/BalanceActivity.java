@@ -42,9 +42,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 public class BalanceActivity extends AppCompatActivity {
 
@@ -64,6 +72,7 @@ public class BalanceActivity extends AppCompatActivity {
     private HashMap<String, Double> ingresosPorCategoria = new HashMap<>();
     private HashMap<String, Double> gastosPorCategoria = new HashMap<>();
     private DatabaseReference historialingreso,historialgasto;
+    private Spinner spinnermesesanios;
 
     // Nuevas variables para el gráfico de ingresos por categoría
     private PieChart pieChartIngresos;
@@ -85,7 +94,7 @@ public class BalanceActivity extends AppCompatActivity {
 
         //Colores en titulo
         TextView textViewTitle = findViewById(R.id.textViewTitle1);
-        String text = "Polliwallet";
+        String text = "Poliwallet";
         // Crea un SpannableString
         SpannableString spannableString = new SpannableString(text);
         // Aplica el color "secondary" para "Poli"
@@ -102,6 +111,8 @@ public class BalanceActivity extends AppCompatActivity {
         historialingreso = FirebaseDatabase.getInstance().getReference("Ingresos").child(userID);
         historialgasto = FirebaseDatabase.getInstance().getReference("Gastos").child(userID);
 
+        spinnermesesanios = findViewById(R.id.spinnermesesanos);
+        cargarmesesanios();
         // Inicializar SharedPreferences
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 
@@ -122,11 +133,11 @@ public class BalanceActivity extends AppCompatActivity {
 
         //Inicializacion del nuevo gráfico de ingresos
         pieChartIngresos = findViewById(R.id.pie_chart_ingresos);
-        configurarGraficoIngresos();
+        //configurarGraficoIngresos();
 
         //Inicialización del gráfico de gastos
         pieChartGastos = findViewById(R.id.pie_chart_gastos);
-        configurarGraficoGastos();
+        //configurarGraficoGastos();
 
         //configurarGraficoPrincipal(totalIngresos,totalGastos);
         // ---------- INICIA SECCIÓN DE INGRESOS ----------
@@ -437,6 +448,9 @@ public class BalanceActivity extends AppCompatActivity {
     }
 
     private void configurarGraficoIngresos() {
+        // Suponemos que este valor se selecciona en el Spinner
+        String mesAnoSeleccionado = spinnermesesanios.getSelectedItem().toString();
+
         DatabaseReference databaseReference = FirebaseDatabase.getInstance()
                 .getReference("Ingresos")
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
@@ -451,27 +465,38 @@ public class BalanceActivity extends AppCompatActivity {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Ingreso ingreso = snapshot.getValue(Ingreso.class);
                     if (ingreso != null) {
-                        String categoria = ingreso.getCategoria();
-                        double monto = ingreso.getMonto();
+                        String fecha = ingreso.getFecha(); // Suponiendo que la fecha está en formato "dd/MM/yyyy"
+                        if (fecha != null) {
+                            String[] partesFecha = fecha.split("/");
+                            if (partesFecha.length == 3) {
+                                String mesAnoIngreso = partesFecha[1] + "/" + partesFecha[2]; // Formato "MM/yyyy"
 
-                        totalIngresos +=monto;
+                                // Filtrar los datos por el mes/año seleccionado
+                                if (mesAnoIngreso.equals(mesAnoSeleccionado)) {
+                                    String categoria = ingreso.getCategoria();
+                                    double monto = ingreso.getMonto();
 
-                        // Agregar o actualizar el monto en el mapa
-                        if (ingresosPorCategoria.containsKey(categoria)) {
-                            ingresosPorCategoria.put(categoria, ingresosPorCategoria.get(categoria) + monto);
-                        } else {
-                            ingresosPorCategoria.put(categoria, monto);
+                                    totalIngresos += monto;
+
+                                    // Agregar o actualizar el monto en el mapa
+                                    if (ingresosPorCategoria.containsKey(categoria)) {
+                                        ingresosPorCategoria.put(categoria, ingresosPorCategoria.get(categoria) + monto);
+                                    } else {
+                                        ingresosPorCategoria.put(categoria, monto);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
 
                 // Llamar al método para actualizar el gráfico después de cargar los datos
                 actualizarGraficoIngresos();
-                if (totalIngresos != 0.0 || dataSnapshot.getChildrenCount() == 0) {
+
                     configurarGraficoBarras(totalIngresos, totalGastos);
                     totalbalance = totalIngresos - totalGastos;
-                    tvBalanceMensual.setText(String.format("$ %.2f",totalbalance));
-                }
+                    tvBalanceMensual.setText(String.format("$ %.2f", totalbalance));
+
             }
 
             @Override
@@ -479,9 +504,11 @@ public class BalanceActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Error al cargar los datos de Firebase", Toast.LENGTH_SHORT).show();
             }
         });
+
     }
 
     private void configurarGraficoGastos() {
+        String mesAnoSeleccionado = spinnermesesanios.getSelectedItem().toString();
         DatabaseReference databaseReference = FirebaseDatabase.getInstance()
                 .getReference("Gastos")
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
@@ -492,30 +519,40 @@ public class BalanceActivity extends AppCompatActivity {
                 gastosPorCategoria.clear(); // Limpiar el mapa antes de llenarlo con nuevos datos
                 totalGastos = 0.0;
 
-                // Procesar cada ingreso en la base de datos
+                // Procesar cada gasto en la base de datos
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Gasto gasto = snapshot.getValue(Gasto.class);
                     if (gasto != null) {
-                        String categoria = gasto.getCategoria();
-                        double monto = gasto.getMonto();
-                        totalGastos += monto;
+                        String fecha = gasto.getFecha(); // Suponiendo que la fecha está en formato "dd/MM/yyyy"
+                        if (fecha != null) {
+                            String[] partesFecha = fecha.split("/");
+                            if (partesFecha.length == 3) {
+                                String mesAnoGasto = partesFecha[1] + "/" + partesFecha[2]; // Formato "MM/yyyy"
 
-                        // Agregar o actualizar el monto en el mapa
-                        if (gastosPorCategoria.containsKey(categoria)) {
-                            gastosPorCategoria.put(categoria, gastosPorCategoria.get(categoria) + monto);
-                        } else {
-                            gastosPorCategoria.put(categoria, monto);
+                                // Filtrar los datos por el mes/año seleccionado
+                                if (mesAnoGasto.equals(mesAnoSeleccionado)) {
+                                    String categoria = gasto.getCategoria();
+                                    double monto = gasto.getMonto();
+                                    totalGastos += monto;
+
+                                    // Agregar o actualizar el monto en el mapa
+                                    if (gastosPorCategoria.containsKey(categoria)) {
+                                        gastosPorCategoria.put(categoria, gastosPorCategoria.get(categoria) + monto);
+                                    } else {
+                                        gastosPorCategoria.put(categoria, monto);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
 
                 // Llamar al método para actualizar el gráfico después de cargar los datos
                 actualizarGraficoGastos();
-                if (totalGastos != 0.0 || dataSnapshot.getChildrenCount() == 0) {
+
                     configurarGraficoBarras(totalIngresos, totalGastos);
                     totalbalance = totalIngresos - totalGastos;
-                    tvBalanceMensual.setText(String.format("$ %.2f",totalbalance));
-                }
+                    tvBalanceMensual.setText(String.format("$ %.2f", totalbalance));
             }
 
             @Override
@@ -541,7 +578,7 @@ public class BalanceActivity extends AppCompatActivity {
         }
 
         PieDataSet dataSetIngresos = new PieDataSet(entriesIngresos, "Categorías de Ingresos");
-        dataSetIngresos.setColors(ColorTemplate.MATERIAL_COLORS); // Usa colores predeterminados
+        dataSetIngresos.setColors(COLORES_CATEGORIAS); // Usa colores predeterminados
         dataSetIngresos.setValueTextSize(12f);
         dataSetIngresos.setValueTextColor(Color.BLACK);
 
@@ -568,7 +605,7 @@ public class BalanceActivity extends AppCompatActivity {
         }
 
         PieDataSet dataSetGastos = new PieDataSet(entriesGastos, "Categorías de Gastos");
-        dataSetGastos.setColors(ColorTemplate.MATERIAL_COLORS);
+        dataSetGastos.setColors(COLORES_CATEGORIAS);
         dataSetGastos.setValueTextSize(12f);
         dataSetGastos.setValueTextColor(Color.BLACK);
 
@@ -660,5 +697,77 @@ public class BalanceActivity extends AppCompatActivity {
                 .setPositiveButton("Si",((dialog, which) -> borrarHistorial()))
                 .setNegativeButton("Cancelar",null)
                 .show();
+    }
+
+    private void cargarmesesanios(){
+        historialingreso.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Set<String> mesesAnos = new HashSet<>();
+
+                for (DataSnapshot data: snapshot.getChildren()){
+                    String fecha = data.child("Fecha").getValue(String.class);
+                    if (fecha != null){
+                        String[] partesfecha = fecha.split("/");
+                        if (partesfecha.length == 3){
+                            String mesAno = partesfecha[1]+"/"+partesfecha[2];
+                            mesesAnos.add(mesAno);
+                        }
+                    }
+                }
+
+                List<String> listameseseanos = new ArrayList<>(mesesAnos);
+                Collections.sort(listameseseanos, (a,b)->{
+                    try {
+                        SimpleDateFormat formato = new SimpleDateFormat("MM/yyyy", Locale.getDefault());
+                        Date fechaA = formato.parse(a);
+                        Date fechaB = formato.parse(b);
+                        return fechaA.compareTo(fechaB);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        return 0;
+                    }
+                });
+                llenarSpinner(listameseseanos);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getApplicationContext(),"Error al cargar las fechas disponibles favor de revisar si hay registros",Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void llenarSpinner(List<String> listaMesesAnos){
+
+        listaMesesAnos.add(0,"Seleccionar mes/año");
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,listaMesesAnos);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnermesesanios.setAdapter(adapter);
+
+        if (listaMesesAnos.size() > 1){
+            spinnermesesanios.setSelection(listaMesesAnos.size()-1);
+        }else{
+            spinnermesesanios.setSelection(0);
+        }
+
+        spinnermesesanios.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String mesAnosSeleccionado = listaMesesAnos.get(position);
+                if (!mesAnosSeleccionado.equals("Seleccionar mes/año")){
+                    configurarGraficoIngresos();
+                    configurarGraficoGastos();
+                }else {
+                    Toast.makeText(getApplicationContext(),"Favor de seleccionar un mes/año",Toast.LENGTH_SHORT).show();
+
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 }

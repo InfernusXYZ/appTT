@@ -28,7 +28,7 @@ public class EncyclopediaActivity extends AppCompatActivity {
 
         //Colores en titulo
         TextView textViewTitle = findViewById(R.id.textViewTitle2);
-        String text = "Polliwallet";
+        String text = "Poliwallet";
         // Crea un SpannableString
         SpannableString spannableString = new SpannableString(text);
         // Aplica el color "secondary" para "Poli"

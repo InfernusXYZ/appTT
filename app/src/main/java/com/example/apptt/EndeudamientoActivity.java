@@ -74,7 +74,7 @@ public class EndeudamientoActivity extends AppCompatActivity {
 
         //Colores en titulo
         TextView textViewTitle = findViewById(R.id.textViewTitle3);
-        String text = "Polliwallet";
+        String text = "Poliwallet";
         // Crea un SpannableString
         SpannableString spannableString = new SpannableString(text);
         // Aplica el color "secondary" para "Poli"
@@ -526,6 +526,10 @@ public class EndeudamientoActivity extends AppCompatActivity {
         String metainput =  etDeuda.getText().toString().trim();
         Double monto = Double.parseDouble(metainput);
         if (user == null) return;
+        if (TextUtils.isEmpty(concepto)||TextUtils.isEmpty(metainput)){
+            Toast.makeText(this,"Favor de llenar todos los campos de la deuda",Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         String userId = user.getUid();
         mDatabase= FirebaseDatabase.getInstance().getReference("Debes")
