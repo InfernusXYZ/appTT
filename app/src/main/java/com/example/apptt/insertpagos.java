@@ -31,6 +31,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -75,6 +76,8 @@ public class insertpagos extends AppCompatActivity {
 
         //Con esta informacion se llena el spinner
         cargarNombresDeudas();
+
+        cargaringresomensual();
 
         spinnerdeudas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -248,10 +251,11 @@ public class insertpagos extends AppCompatActivity {
                 }
             }
         });
+        guardarGastos();
     }
 
     private String obtenerfecha(){
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         Date date=new Date();
         return dateFormat.format(date);
     }
@@ -265,7 +269,113 @@ public class insertpagos extends AppCompatActivity {
                 .show();
     }
 
-    private void Progresodeuda(){
+    private void cargaringresomensual(){
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance()
+                .getReference("Ingresos")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
+// Primero obtenemos el último mes/año registrado
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String ultimoMesAno = null;
+                SimpleDateFormat dateFormat = new SimpleDateFormat("MM/yyyy", Locale.getDefault());
+
+                // Determinamos el último mes/año registrado
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Ingreso ingreso = snapshot.getValue(Ingreso.class);
+                    if (ingreso != null) {
+                        String fecha = ingreso.getFecha(); // Suponiendo que la fecha está en formato "dd/MM/yyyy"
+                        if (fecha != null) {
+                            try {
+                                String[] partesFecha = fecha.split("/");
+                                if (partesFecha.length == 3) {
+                                    String mesAno = partesFecha[1] + "/" + partesFecha[2];
+                                    if (ultimoMesAno == null || dateFormat.parse(mesAno).after(dateFormat.parse(ultimoMesAno))) {
+                                        ultimoMesAno = mesAno;
+                                    }
+                                }
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+
+                // Usamos el último mes/año registrado o un valor predeterminado si no hay registros
+                String mesAnoSeleccionado = (ultimoMesAno != null) ? ultimoMesAno : "01/1970";
+
+                // Ahora procesamos los ingresos con el mes/año seleccionado
+                cargarIngresosPorMesAno(mesAnoSeleccionado);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(getApplicationContext(), "Error al cargar los datos de Firebase", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void cargarIngresosPorMesAno(String mesAnoSeleccionado) {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance()
+                .getReference("Ingresos")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                double totalIngresos = 0.0;
+
+                // Procesar cada ingreso en la base de datos
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Ingreso ingreso = snapshot.getValue(Ingreso.class);
+                    if (ingreso != null) {
+                        String fecha = ingreso.getFecha(); // Suponiendo que la fecha está en formato "dd/MM/yyyy"
+                        if (fecha != null) {
+                            String[] partesFecha = fecha.split("/");
+                            if (partesFecha.length == 3) {
+                                String mesAnoIngreso = partesFecha[1] + "/" + partesFecha[2]; // Formato "MM/yyyy"
+
+                                // Filtrar los datos por el mes/año seleccionado
+                                if (mesAnoIngreso.equals(mesAnoSeleccionado)) {
+                                    double monto = ingreso.getMonto();
+
+                                    totalIngresos += monto;
+                                }
+                            }
+                        }
+                    }
+                }
+                etingresos.setText(String.format("%.2f", totalIngresos));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(getApplicationContext(), "Error al cargar los datos de Firebase", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    private void guardarGastos() {
+        double monto = Double.parseDouble(pagosStr);
+        String userID = mAuth.getCurrentUser().getUid();
+        Map<String, Object> gastoMap = new HashMap<>();
+            gastoMap.put("Fecha",obtenerfecha());
+            gastoMap.put("Categoria", "Otros Gastos");
+            gastoMap.put("Tipo", "Fijo");
+            gastoMap.put("Concepto", tipostr);
+            gastoMap.put("Monto", monto);
+
+
+        mDatabase.child("Gastos").child(userID).push().setValue(gastoMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(insertpagos.this, "Ingreso guardado correctamente", Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    Toast.makeText(insertpagos.this, "Error al guardar el ingreso", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }

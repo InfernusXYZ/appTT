@@ -91,6 +91,7 @@
                 android:justificationMode="inter_word"/>
 
             <TextView
+                android:id="@+id/tvmetaA"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Meta"
@@ -175,6 +176,7 @@
                 android:layout_height="wrap_content"
                 android:text="Ingresos Mensuales Totales"
                 android:textSize="18sp"
+                android:visibility="gone"
                 android:layout_marginBottom="8dp"/>
 
             <!-- Campo de texto para ingresar el monto de Ingresos Mensuales -->
@@ -184,7 +186,8 @@
                 android:layout_height="wrap_content"
                 android:inputType="numberDecimal"
                 android:hint="Ingrese sus ingresos mensuales totales"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="16dp"
+                android:visibility="gone"/>
 
             <!-- Sección de Ahorro Mensual -->
             <TextView
@@ -192,6 +195,7 @@
                 android:layout_height="wrap_content"
                 android:text="Ahorro Mensual Total"
                 android:textSize="18sp"
+                android:visibility="gone"
                 android:layout_marginBottom="8dp"/>
 
             <!-- Campo de texto para ingresar el monto de Ahorro Mensual -->
@@ -200,6 +204,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="numberDecimal"
+                android:visibility="gone"
                 android:hint="Ingrese su ahorro mensual totales"
                 android:layout_marginBottom="16dp"/>
 
@@ -209,6 +214,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Calcular"
+                android:visibility="gone"
                 android:backgroundTint="@color/secondary"
                 android:textColor="#FFFFFF"
                 android:layout_marginBottom="24dp"/>

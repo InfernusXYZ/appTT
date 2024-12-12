@@ -62,7 +62,8 @@
         android:layout_height="wrap_content"
         android:inputType="numberDecimal"
         android:hint="Ingrese sus ingresos mensuales totales"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp"
+        android:enabled="false"/>
 
     <!-- Campo para Pagos Mensuales -->
     <TextView

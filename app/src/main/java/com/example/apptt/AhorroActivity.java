@@ -61,7 +61,7 @@ import java.util.Map;
 public class AhorroActivity extends AppCompatActivity {
 
     private EditText etIngresosMensuales, etAhorroMensual, etmetaahorro;
-    private TextView tvHistorialAhorro, tvHistorialahorromen, tvHistorialporcentge, tvprogreso, tvmeta, tvahorroAct, tvprogresotexto;
+    private TextView tvmetatexto,tvHistorialAhorro, tvHistorialahorromen, tvHistorialporcentge, tvprogreso, tvmeta, tvahorroAct, tvprogresotexto;
     private PieChart pieChart;
     private BarChart barChart;
     private List<String> historialList;
@@ -110,6 +110,7 @@ public class AhorroActivity extends AppCompatActivity {
         tvprogresotexto = findViewById(R.id.tvProgresoTexto);
         tvahorroAct = findViewById(R.id.tvProgresoPorcentaje);
         tvmeta = findViewById(R.id.tvMeta);
+        tvmetatexto = findViewById(R.id.tvmetaA);
         tvprogreso = findViewById(R.id.tvprogresometa);
         pieChart = findViewById(R.id.pieChart);
         //barChart = findViewById(R.id.barChart);
@@ -425,13 +426,20 @@ public class AhorroActivity extends AppCompatActivity {
 
     private void desactivarEdicionMeta(){
         etmetaahorro.setEnabled(false);
+        etmetaahorro.setVisibility(View.GONE);
         btnmeta.setEnabled(false);
-
+        btnmeta.setVisibility(View.GONE);
+        tvmetatexto.setVisibility(View.GONE);
+        etmetaahorro.setHint("Termine la meta actual");
     }
 
     private void activarEdicionMeta(){
         etmetaahorro.setEnabled(true);
+        etmetaahorro.setVisibility(View.VISIBLE);
         btnmeta.setEnabled(true);
+        btnmeta.setVisibility(View.VISIBLE);
+        tvmetatexto.setVisibility(View.VISIBLE);
+        etmetaahorro.setHint("Ingrese nueva meta");
 
     }
 
@@ -562,8 +570,10 @@ public class AhorroActivity extends AppCompatActivity {
         builder.show();
     }
     private String obtenerfecha(){
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         Date date=new Date();
         return dateFormat.format(date);
     }
+
+
 }
