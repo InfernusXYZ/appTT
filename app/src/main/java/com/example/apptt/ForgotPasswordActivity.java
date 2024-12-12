@@ -9,37 +9,42 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 public class ForgotPasswordActivity extends AppCompatActivity {
+    private FirebaseAuth auth;
     EditText etCorreo;
     Button btRecuperar;
-    DatabaseHelper db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_password);
         etCorreo = findViewById(R.id.et_correo_recuperar);
         btRecuperar = findViewById(R.id.btn_enviar_contrasena);
-        db = new DatabaseHelper(this);
+        auth = FirebaseAuth.getInstance();
 
-        btRecuperar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String correo = etCorreo.getText().toString().trim();
+        btRecuperar.setOnClickListener(v -> {
+            String email = etCorreo.getText().toString().trim();
 
-                if (correo.isEmpty()){
-                    Toast.makeText(ForgotPasswordActivity.this,"Ingresa el correo por favor",Toast.LENGTH_SHORT).show();
-                }else{
-                    String contrasena = db.RecoveryPassword(correo);
-                    if (contrasena != null){
-                        Toast.makeText(ForgotPasswordActivity.this,"Tu contraseña es:"+contrasena,Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(ForgotPasswordActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }else {
-                        Toast.makeText(ForgotPasswordActivity.this,"El correo no existe",Toast.LENGTH_SHORT).show();
-                    }
-                }
+            if (email.isEmpty()) {
+                Toast.makeText(this, "Por favor, ingresa tu correo electrónico.", Toast.LENGTH_SHORT).show();
+            } else {
+                sendPasswordResetEmail(email);
             }
         });
+    }
+
+    private void sendPasswordResetEmail(String email) {
+        auth.sendPasswordResetEmail(email)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(this, "Correo de recuperación enviado.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, "Error al enviar el correo: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(ForgotPasswordActivity.this,MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
     }
 }
