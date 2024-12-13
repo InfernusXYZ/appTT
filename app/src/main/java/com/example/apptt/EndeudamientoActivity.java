@@ -8,8 +8,12 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,11 +41,14 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 public class EndeudamientoActivity extends AppCompatActivity {
 
@@ -54,6 +61,7 @@ public class EndeudamientoActivity extends AppCompatActivity {
     private double totalPagos = 0.0;
     private double totalDeudas = 0.0;
     private boolean alertamostrada = false;
+    private Spinner spinnermesesanios;
 
     // Variables para almacenar datos
     private SharedPreferences sharedPreferences;
@@ -94,6 +102,7 @@ public class EndeudamientoActivity extends AppCompatActivity {
         tvHistorialGastos = findViewById(R.id.tv_historial_pagmen);
         tvHistorialrelacion = findViewById(R.id.tv_historial_relacion);*/
         tvprogreso = findViewById(R.id.tvdeudatotal);
+        spinnermesesanios = findViewById(R.id.spinnermesesanos);
         btnCalcular = findViewById(R.id.btn_calcular);
         btnDeuda = findViewById(R.id.btn_deuda);
         btnBorrarHistorial = findViewById(R.id.btn_borrar_historial);
@@ -116,10 +125,10 @@ public class EndeudamientoActivity extends AppCompatActivity {
         //loadSavedData();
         cargarDatosFirebase();
         cargarHistorial();
+        cargarmesesanios();
 
 
         initializeCharts();
-        cargarTotalesFirebaseYActualizarGraficas();
 
         btnDeuda.setOnClickListener(view -> agregarDeudaAFirebase());
         btnCalcular.setOnClickListener(view -> {
@@ -403,6 +412,7 @@ public class EndeudamientoActivity extends AppCompatActivity {
 
     private void cargarTotalesFirebaseYActualizarGraficas() {
 
+        String mesAnoSeleccionado = spinnermesesanios.getSelectedItem().toString();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return;
 
@@ -412,17 +422,30 @@ public class EndeudamientoActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 double totalIngresos = 0;
-                double totalPagos = 0;
+                double totalAhorro = 0;
 
                 for (DataSnapshot mesSnapshot : snapshot.getChildren()) {
-                    Double ingresoMensual = mesSnapshot.child("IngresoMensual").getValue(Double.class);
-                    Double pagoMensual = mesSnapshot.child("PagoMensual").getValue(Double.class);
+                    // Suponiendo que el nodo hijo tiene un campo "Fecha" en formato "dd/MM/yyyy"
+                    String fechaCompleta = mesSnapshot.child("Fecha").getValue(String.class);
+                    if (fechaCompleta != null) {
+                        // Extraer mes y año
+                        String[] partesFecha = fechaCompleta.split("/");
+                        if (partesFecha.length == 3) {
+                            String mesAnoIngreso = partesFecha[1] + "/" + partesFecha[2]; // Formato "MM/yyyy"
 
-                    if (ingresoMensual != null) totalIngresos += ingresoMensual;
-                    if (pagoMensual != null) totalPagos += pagoMensual;
+                            // Comparar con la selección del Spinner
+                            if (mesAnoIngreso.equals(mesAnoSeleccionado)) {
+                                Double ingresoMensual = mesSnapshot.child("IngresoMensual").getValue(Double.class);
+                                Double ahorroMensual = mesSnapshot.child("PagoMensual").getValue(Double.class);
+
+                                if (ingresoMensual != null) totalIngresos += ingresoMensual;
+                                if (ahorroMensual != null) totalAhorro += ahorroMensual;
+                            }
+                        }
+                    }
                 }
 
-                actualizarGraficas(totalIngresos, totalPagos);
+                actualizarGraficas(totalIngresos, totalAhorro);
             }
 
             @Override
@@ -592,7 +615,7 @@ public class EndeudamientoActivity extends AppCompatActivity {
     }
 
     private String obtenerfecha(){
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         Date date=new Date();
         return dateFormat.format(date);
     }
@@ -677,4 +700,74 @@ public class EndeudamientoActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
+    private void cargarmesesanios(){
+        historialdeuda.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Set<String> mesesAnos = new HashSet<>();
+
+                for (DataSnapshot data: snapshot.getChildren()){
+                    String fecha = data.child("Fecha").getValue(String.class);
+                    if (fecha != null){
+                        String[] partesfecha = fecha.split("/");
+                        if (partesfecha.length == 3){
+                            String mesAno = partesfecha[1]+"/"+partesfecha[2];
+                            mesesAnos.add(mesAno);
+                        }
+                    }
+                }
+
+                List<String> listameseseanos = new ArrayList<>(mesesAnos);
+                Collections.sort(listameseseanos, (a, b)->{
+                    try {
+                        SimpleDateFormat formato = new SimpleDateFormat("MM/yyyy", Locale.getDefault());
+                        Date fechaA = formato.parse(a);
+                        Date fechaB = formato.parse(b);
+                        return fechaA.compareTo(fechaB);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        return 0;
+                    }
+                });
+                llenarSpinner(listameseseanos);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getApplicationContext(),"Error al cargar las fechas disponibles favor de revisar si hay registros",Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void llenarSpinner(List<String> listaMesesAnos){
+
+        listaMesesAnos.add(0,"Seleccionar mes/año");
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,listaMesesAnos);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnermesesanios.setAdapter(adapter);
+
+        if (listaMesesAnos.size() > 1){
+            spinnermesesanios.setSelection(listaMesesAnos.size()-1);
+        }else{
+            spinnermesesanios.setSelection(0);
+        }
+
+        spinnermesesanios.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String mesAnosSeleccionado = listaMesesAnos.get(position);
+                if (!mesAnosSeleccionado.equals("Seleccionar mes/año")){
+                    cargarTotalesFirebaseYActualizarGraficas();
+                }else {
+                    Toast.makeText(getApplicationContext(),"Favor de seleccionar un mes/año",Toast.LENGTH_SHORT).show();
+
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
 }

@@ -12,9 +12,12 @@ import android.text.SpannableString;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,11 +55,14 @@ import com.google.firebase.database.ValueEventListener;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 public class AhorroActivity extends AppCompatActivity {
 
@@ -70,12 +76,13 @@ public class AhorroActivity extends AppCompatActivity {
     private double metaAhorro = 0.0;
     private boolean alertaMostrada = false;
     private double progresoAhorro = 0.0;
-    private DatabaseReference metaRef, ahorroRef;
+    private DatabaseReference metaRef, ahorroRef, ahorromeses;
     private Button btnmeta, btnreinicio;
     private ProgressBar progressBarahorro;
     private ValueEventListener metaListener;
     private ValueEventListener ahorrosListener;
     private boolean isListenerInitialized = false;
+    private Spinner spinnermesesanios;
     private String ingresosStr, ahorroStr;
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
@@ -112,6 +119,8 @@ public class AhorroActivity extends AppCompatActivity {
         tvmeta = findViewById(R.id.tvMeta);
         tvmetatexto = findViewById(R.id.tvmetaA);
         tvprogreso = findViewById(R.id.tvprogresometa);
+        spinnermesesanios = findViewById(R.id.spinnermesesanos);
+
         pieChart = findViewById(R.id.pieChart);
         //barChart = findViewById(R.id.barChart);
         Button btnCalcular = findViewById(R.id.btn_calcular);
@@ -131,8 +140,10 @@ public class AhorroActivity extends AppCompatActivity {
         String userId = auth.getCurrentUser().getUid();
 
         metaRef = FirebaseDatabase.getInstance().getReference("Metas").child(userId);
+        ahorromeses = FirebaseDatabase.getInstance().getReference("Ahorros").child(userId);
         ahorroRef = FirebaseDatabase.getInstance().getReference("Ahorros").child(userId);
         // Inicializar SharedPreferences
+        cargarmesesanios();
         sharedPreferences = getSharedPreferences("AhorroPrefs", Context.MODE_PRIVATE);
 
         historialList = new ArrayList<>();
@@ -146,7 +157,6 @@ public class AhorroActivity extends AppCompatActivity {
         }
         // Inicializar las gráficas en blanco
         initializeCharts();
-        cargarTotalesFirebaseYActualizarGraficas();
 
         btninsert.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -250,7 +260,7 @@ public class AhorroActivity extends AppCompatActivity {
     }
 
     private void cargarTotalesFirebaseYActualizarGraficas() {
-
+        String mesAnoSeleccionado = spinnermesesanios.getSelectedItem().toString();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return;
 
@@ -263,11 +273,24 @@ public class AhorroActivity extends AppCompatActivity {
                 double totalAhorro = 0;
 
                 for (DataSnapshot mesSnapshot : snapshot.getChildren()) {
-                    Double ingresoMensual = mesSnapshot.child("IngresoMensual").getValue(Double.class);
-                    Double ahorroMensual = mesSnapshot.child("AhorroMensual").getValue(Double.class);
+                    // Suponiendo que el nodo hijo tiene un campo "Fecha" en formato "dd/MM/yyyy"
+                    String fechaCompleta = mesSnapshot.child("Fecha").getValue(String.class);
+                    if (fechaCompleta != null) {
+                        // Extraer mes y año
+                        String[] partesFecha = fechaCompleta.split("/");
+                        if (partesFecha.length == 3) {
+                            String mesAnoIngreso = partesFecha[1] + "/" + partesFecha[2]; // Formato "MM/yyyy"
 
-                    if (ingresoMensual != null) totalIngresos += ingresoMensual;
-                    if (ahorroMensual != null) totalAhorro += ahorroMensual;
+                            // Comparar con la selección del Spinner
+                            if (mesAnoIngreso.equals(mesAnoSeleccionado)) {
+                                Double ingresoMensual = mesSnapshot.child("IngresoMensual").getValue(Double.class);
+                                Double ahorroMensual = mesSnapshot.child("AhorroMensual").getValue(Double.class);
+
+                                if (ingresoMensual != null) totalIngresos += ingresoMensual;
+                                if (ahorroMensual != null) totalAhorro += ahorroMensual;
+                            }
+                        }
+                    }
                 }
 
                 actualizarGraficas(totalIngresos, totalAhorro);
@@ -573,6 +596,77 @@ public class AhorroActivity extends AppCompatActivity {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         Date date=new Date();
         return dateFormat.format(date);
+    }
+
+    private void cargarmesesanios(){
+        ahorromeses.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Set<String> mesesAnos = new HashSet<>();
+
+                for (DataSnapshot data: snapshot.getChildren()){
+                    String fecha = data.child("Fecha").getValue(String.class);
+                    if (fecha != null){
+                        String[] partesfecha = fecha.split("/");
+                        if (partesfecha.length == 3){
+                            String mesAno = partesfecha[1]+"/"+partesfecha[2];
+                            mesesAnos.add(mesAno);
+                        }
+                    }
+                }
+
+                List<String> listameseseanos = new ArrayList<>(mesesAnos);
+                Collections.sort(listameseseanos, (a, b)->{
+                    try {
+                        SimpleDateFormat formato = new SimpleDateFormat("MM/yyyy", Locale.getDefault());
+                        Date fechaA = formato.parse(a);
+                        Date fechaB = formato.parse(b);
+                        return fechaA.compareTo(fechaB);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        return 0;
+                    }
+                });
+                llenarSpinner(listameseseanos);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getApplicationContext(),"Error al cargar las fechas disponibles favor de revisar si hay registros",Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void llenarSpinner(List<String> listaMesesAnos){
+
+        listaMesesAnos.add(0,"Seleccionar mes/año");
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,listaMesesAnos);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnermesesanios.setAdapter(adapter);
+
+        if (listaMesesAnos.size() > 1){
+            spinnermesesanios.setSelection(listaMesesAnos.size()-1);
+        }else{
+            spinnermesesanios.setSelection(0);
+        }
+
+        spinnermesesanios.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String mesAnosSeleccionado = listaMesesAnos.get(position);
+                if (!mesAnosSeleccionado.equals("Seleccionar mes/año")){
+                    cargarTotalesFirebaseYActualizarGraficas();
+                }else {
+                    Toast.makeText(getApplicationContext(),"Favor de seleccionar un mes/año",Toast.LENGTH_SHORT).show();
+
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
 

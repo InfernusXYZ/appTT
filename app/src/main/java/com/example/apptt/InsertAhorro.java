@@ -1,11 +1,13 @@
 package com.example.apptt;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -26,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -33,10 +36,12 @@ import java.util.Map;
 
 public class InsertAhorro extends AppCompatActivity {
 
+    private TextView tvFecha;
     private EditText etingmen, etahorromen;
-    private Button btncalcular, btnregresar;
+    private Button btncalcular, btnregresar, btnfecha;
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
+    private String fechaseleccionada;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,11 +50,14 @@ public class InsertAhorro extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
+        tvFecha = findViewById(R.id.tvFecha);
         etingmen = findViewById(R.id.et_ingresos_mensuales);
         etahorromen = findViewById(R.id.et_ahorro_mensual);
+        btnfecha = findViewById(R.id.btnFecha);
         btncalcular = findViewById(R.id.btn_calcular);
         btnregresar = findViewById(R.id.btnregresar);
 
+        inicializarfecha();
         cargaringresomensual();
 
         btnregresar.setOnClickListener(new View.OnClickListener() {
@@ -67,6 +75,8 @@ public class InsertAhorro extends AppCompatActivity {
                 guardarahorro();
             }
         });
+
+        btnfecha.setOnClickListener(v -> mostrarDatePicker());
     }
 
     private void guardarahorro(){
@@ -90,7 +100,7 @@ public class InsertAhorro extends AppCompatActivity {
         String userID = mAuth.getCurrentUser().getUid();
 
         Map<String,Object> AhorroMap = new HashMap<>();
-        AhorroMap.put("Fecha",obtenerfecha());
+        AhorroMap.put("Fecha",fechaseleccionada);
         AhorroMap.put("IngresoMensual",Ingresomensual);
         AhorroMap.put("AhorroMensual",Ahorromensual);
         AhorroMap.put("TasaAhorro",porcentajeAhorro);
@@ -200,5 +210,30 @@ public class InsertAhorro extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Error al cargar los datos de Firebase", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void mostrarDatePicker(){
+        final Calendar calendar= Calendar.getInstance();
+        int anio = calendar.get(Calendar.YEAR);
+        int mes = calendar.get(Calendar.MONTH);
+        int dia = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                this,
+                (view, year, month, dayOfMonth) -> {
+                    fechaseleccionada = dayOfMonth + "/" + (month+1) + "/" + year;
+                    tvFecha.setText(fechaseleccionada);
+                },
+                anio,mes,dia);
+        datePickerDialog.show();
+    }
+
+    private void inicializarfecha(){
+        final Calendar calendar= Calendar.getInstance();
+        int anio = calendar.get(Calendar.YEAR);
+        int mes = calendar.get(Calendar.MONTH);
+        int dia = calendar.get(Calendar.DAY_OF_MONTH);
+        fechaseleccionada = dia + "/" + (mes+1) + "/" + anio;
+        tvFecha.setText(fechaseleccionada);
     }
 }

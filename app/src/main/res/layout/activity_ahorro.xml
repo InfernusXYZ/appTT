@@ -237,6 +237,10 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"/>
 
+            <Spinner
+                android:id="@+id/spinnermesesanos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
             <!-- Gráfica de pastel -->
             <com.github.mikephil.charting.charts.PieChart
                 android:id="@+id/pieChart"
