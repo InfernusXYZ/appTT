@@ -371,7 +371,6 @@ public class insertpagos extends AppCompatActivity {
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
                     Toast.makeText(insertpagos.this, "Ingreso guardado correctamente", Toast.LENGTH_SHORT).show();
-                    finish();
                 } else {
                     Toast.makeText(insertpagos.this, "Error al guardar el ingreso", Toast.LENGTH_SHORT).show();
                 }

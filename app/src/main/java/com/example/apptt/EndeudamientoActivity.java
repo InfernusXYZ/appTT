@@ -130,7 +130,13 @@ public class EndeudamientoActivity extends AppCompatActivity {
 
         initializeCharts();
 
-        btnDeuda.setOnClickListener(view -> agregarDeudaAFirebase());
+        btnDeuda.setOnClickListener(view -> {
+            if (etDeuda.getText().toString().isEmpty() ||etConcepto.getText().toString().isEmpty()) {
+                Toast.makeText(this, "Por favor llene todos los campos. de la deuda", Toast.LENGTH_SHORT).show();
+                return;
+            }
+                agregarDeudaAFirebase();
+        });
         btnCalcular.setOnClickListener(view -> {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             if(user == null){
@@ -549,8 +555,13 @@ public class EndeudamientoActivity extends AppCompatActivity {
         String metainput =  etDeuda.getText().toString().trim();
         Double monto = Double.parseDouble(metainput);
         if (user == null) return;
-        if (TextUtils.isEmpty(concepto)||TextUtils.isEmpty(metainput)){
-            Toast.makeText(this,"Favor de llenar todos los campos de la deuda",Toast.LENGTH_SHORT).show();
+        if (TextUtils.isEmpty(concepto)) {
+            Toast.makeText(this, "El campo 'concepto' no puede estar vacío.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (TextUtils.isEmpty(metainput)) {
+            Toast.makeText(this, "El campo 'monto de deuda' no puede estar vacío.", Toast.LENGTH_SHORT).show();
             return;
         }
 

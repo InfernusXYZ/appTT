@@ -1,6 +1,8 @@
 package com.example.apptt;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -110,9 +112,7 @@ public class InsertAhorro extends AppCompatActivity {
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()){
                     Toast.makeText(InsertAhorro.this,"Ingreso guardado correctamente",Toast.LENGTH_SHORT).show();
-                    Intent intent= new Intent(InsertAhorro.this, AhorroActivity.class);
-                    startActivity(intent);
-                    finish();
+                    mostrarAlertaPorcentajeAhorro(porcentajeAhorro);
                 }else {
                     Toast.makeText(InsertAhorro.this,"Error al guardar el ingreso",Toast.LENGTH_SHORT).show();
                 }
@@ -235,5 +235,47 @@ public class InsertAhorro extends AppCompatActivity {
         int dia = calendar.get(Calendar.DAY_OF_MONTH);
         fechaseleccionada = dia + "/" + (mes+1) + "/" + anio;
         tvFecha.setText(fechaseleccionada);
+    }
+
+    private void mostrarAlertaPorcentajeAhorro(double porcentajeAhorro) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(InsertAhorro.this);
+        builder.setTitle("Tasa de Ahorro");
+
+        boolean mostrarAlerta = false; // Variable para controlar si se muestra la alerta
+
+        // Verificar el rango del porcentaje y mostrar el mensaje adecuado
+        if (porcentajeAhorro >= 40) {
+            builder.setMessage("¡Felicidades! Estás ahorrando más del 40% de tus ingresos. ¡Sigue así!");
+            mostrarAlerta = true;
+        } else if (porcentajeAhorro >= 30 && porcentajeAhorro < 40) {
+            builder.setMessage("Tu tasa de ahorro es buena. Si continúas con este ritmo, lograrás tus metas de ahorro más rápido.");
+            mostrarAlerta = true;
+        } else if (porcentajeAhorro >= 20 && porcentajeAhorro < 30) {
+            builder.setMessage("Tu tasa de ahorro es entre el 20% y el 30%. Intenta aumentar un poco más para mejorar tu estabilidad financiera.");
+            mostrarAlerta = true;
+        } else {
+            builder.setMessage("Tu tasa de ahorro es baja. Intenta ahorrar un poco más cada mes. Revisa tus gastos y ve qué áreas puedes ajustar.");
+            mostrarAlerta = true;
+        }
+
+        if (mostrarAlerta) {
+            // Configurar el botón y el comportamiento
+            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // Moverse a la siguiente pantalla solo después de confirmar la alerta
+                    Intent intent = new Intent(InsertAhorro.this, AhorroActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            });
+
+            builder.show();
+        } else {
+            // Si no se muestra la alerta, moverse directamente a la otra pantalla
+            Intent intent = new Intent(InsertAhorro.this, AhorroActivity.class);
+            startActivity(intent);
+            finish();
+        }
     }
 }

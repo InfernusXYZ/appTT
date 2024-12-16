@@ -63,7 +63,7 @@ public class RegisterActivity extends AppCompatActivity {
             Toast.makeText(this, "Favor de ingresar todos los datos solicitados", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (contrasena.length()<=6){
+        if (contrasena.length()<6){
             Toast.makeText(this,"La contraseña debe estar compuesta por 6 o mas caracteres",Toast.LENGTH_SHORT).show();
         }
         if (!contrasena.equals(confirmar)) {
