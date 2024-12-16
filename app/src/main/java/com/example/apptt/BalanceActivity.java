@@ -680,6 +680,7 @@ public class BalanceActivity extends AppCompatActivity {
         //actualizarGrafico();
         actualizarGraficoIngresos();
         actualizarGraficoGastos();
+        this.recreate();
     }
 
     // Método para guardar el historial en SharedPreferences

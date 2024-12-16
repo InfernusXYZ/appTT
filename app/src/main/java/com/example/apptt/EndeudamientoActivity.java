@@ -349,9 +349,7 @@ public class EndeudamientoActivity extends AppCompatActivity {
         });
         // Limpiar las gráficas
         initializeCharts();
-        Intent intent = getIntent();
-        finish();
-        startActivity(intent);
+        this.recreate();
         Toast.makeText(EndeudamientoActivity.this, "Historial y gráficas borradas", Toast.LENGTH_SHORT).show();
     }
 

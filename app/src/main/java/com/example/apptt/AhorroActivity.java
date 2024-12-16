@@ -434,8 +434,12 @@ public class AhorroActivity extends AppCompatActivity {
         String metainput =  etmetaahorro.getText().toString().trim();
         if (!metainput.isEmpty()){
             alertaMostrada = false;
-            actualizarprogreso();
+            //actualizarprogreso();
             metaAhorro = Double.parseDouble(metainput);
+            if (metaAhorro<=progresoAhorro){
+                Toast.makeText(this,"La meta deseada no es factible",Toast.LENGTH_SHORT).show();
+                return;
+            }
             metaRef.setValue(metaAhorro);
             etmetaahorro.setText("");
             desactivarEdicionMeta();
@@ -519,6 +523,7 @@ public class AhorroActivity extends AppCompatActivity {
         metaAhorro = 0.0;
         activarEdicionMeta();
         actualizarprogreso();
+        this.recreate();
         Toast.makeText(this,"Listo para una nueva meta de ahorro",Toast.LENGTH_SHORT).show();
     }
 
