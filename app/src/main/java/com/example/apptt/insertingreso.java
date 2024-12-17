@@ -150,6 +150,8 @@ public class insertingreso extends AppCompatActivity {
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()){
                     Toast.makeText(insertingreso.this,"Ingreso guardado correctamente",Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(insertingreso.this,BalanceActivity.class);
+                    startActivity(intent);
                     finish();
                 }else {
                     Toast.makeText(insertingreso.this,"Error al guardar el ingreso",Toast.LENGTH_SHORT).show();

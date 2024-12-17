@@ -81,12 +81,12 @@ public class InsertAhorro extends AppCompatActivity {
         btnfecha.setOnClickListener(v -> mostrarDatePicker());
     }
 
-    private void guardarahorro(){
+    private void guardarahorro() {
         String Ingresomen = etingmen.getText().toString();
         String Ahorromen = etahorromen.getText().toString();
 
-        if(TextUtils.isEmpty(Ingresomen)||TextUtils.isEmpty(Ahorromen)){
-            Toast.makeText(this,"Llene los campos correspondientes",Toast.LENGTH_SHORT).show();
+        if (TextUtils.isEmpty(Ingresomen) || TextUtils.isEmpty(Ahorromen)) {
+            Toast.makeText(this, "Llene los campos correspondientes", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -94,28 +94,26 @@ public class InsertAhorro extends AppCompatActivity {
         double Ahorromensual = Double.parseDouble(Ahorromen);
         double porcentajeAhorro = (Ahorromensual / Ingresomensual) * 100;
 
-        if (Ingresomensual <= Ahorromensual){
-            Toast.makeText(this,"No puede ahorra mas de lo que gana", Toast.LENGTH_SHORT).show();
+        if (Ingresomensual <= Ahorromensual) {
+            Toast.makeText(this, "No puede ahorrar más de lo que gana", Toast.LENGTH_SHORT).show();
             return;
         }
 
         String userID = mAuth.getCurrentUser().getUid();
 
-        Map<String,Object> AhorroMap = new HashMap<>();
-        AhorroMap.put("Fecha",fechaseleccionada);
-        AhorroMap.put("IngresoMensual",Ingresomensual);
-        AhorroMap.put("AhorroMensual",Ahorromensual);
-        AhorroMap.put("TasaAhorro",porcentajeAhorro);
+        Map<String, Object> AhorroMap = new HashMap<>();
+        AhorroMap.put("Fecha", fechaseleccionada);
+        AhorroMap.put("IngresoMensual", Ingresomensual);
+        AhorroMap.put("AhorroMensual", Ahorromensual);
+        AhorroMap.put("TasaAhorro", porcentajeAhorro);
 
-        mDatabase.child("Ahorros").child(userID).push().setValue(AhorroMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()){
-                    Toast.makeText(InsertAhorro.this,"Ingreso guardado correctamente",Toast.LENGTH_SHORT).show();
-                    mostrarAlertaPorcentajeAhorro(porcentajeAhorro);
-                }else {
-                    Toast.makeText(InsertAhorro.this,"Error al guardar el ingreso",Toast.LENGTH_SHORT).show();
-                }
+        mDatabase.child("Ahorros").child(userID).push().setValue(AhorroMap).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(InsertAhorro.this, "Ingreso guardado correctamente", Toast.LENGTH_SHORT).show();
+                // Iniciar la actividad para mostrar la alerta
+                mostrarAlertaPorcentajeAhorro(porcentajeAhorro);
+            } else {
+                Toast.makeText(InsertAhorro.this, "Error al guardar el ingreso", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -241,41 +239,27 @@ public class InsertAhorro extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(InsertAhorro.this);
         builder.setTitle("Tasa de Ahorro");
 
-        boolean mostrarAlerta = false; // Variable para controlar si se muestra la alerta
-
-        // Verificar el rango del porcentaje y mostrar el mensaje adecuado
         if (porcentajeAhorro >= 40) {
             builder.setMessage("¡Felicidades! Estás ahorrando más del 40% de tus ingresos. ¡Sigue así!");
-            mostrarAlerta = true;
-        } else if (porcentajeAhorro >= 30 && porcentajeAhorro < 40) {
-            builder.setMessage("Tu tasa de ahorro es buena. Si continúas con este ritmo, lograrás tus metas de ahorro más rápido.");
-            mostrarAlerta = true;
-        } else if (porcentajeAhorro >= 20 && porcentajeAhorro < 30) {
-            builder.setMessage("Tu tasa de ahorro es entre el 20% y el 30%. Intenta aumentar un poco más para mejorar tu estabilidad financiera.");
-            mostrarAlerta = true;
+        } else if (porcentajeAhorro >= 30) {
+            builder.setMessage("Tu tasa de ahorro es buena. ¡Continúa así!");
+        } else if (porcentajeAhorro >= 20) {
+            builder.setMessage("Tu tasa de ahorro es moderada. ¡Intenta aumentarla un poco más!");
         } else {
-            builder.setMessage("Tu tasa de ahorro es baja. Intenta ahorrar un poco más cada mes. Revisa tus gastos y ve qué áreas puedes ajustar.");
-            mostrarAlerta = true;
+            builder.setMessage("Tu tasa de ahorro es baja. Ajusta tus gastos y ahorra más.");
         }
 
-        if (mostrarAlerta) {
-            // Configurar el botón y el comportamiento
-            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    // Moverse a la siguiente pantalla solo después de confirmar la alerta
-                    Intent intent = new Intent(InsertAhorro.this, AhorroActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-            });
-
-            builder.show();
-        } else {
-            // Si no se muestra la alerta, moverse directamente a la otra pantalla
-            Intent intent = new Intent(InsertAhorro.this, AhorroActivity.class);
+        builder.setPositiveButton("Ok", (dialog, which) -> {
+            // Configuramos el resultado y cerramos la actividad
+            Intent intent = new Intent(InsertAhorro.this,AhorroActivity.class);
             startActivity(intent);
             finish();
-        }
+        });
+
+        builder.setCancelable(false); // Bloquear cierre accidental
+        builder.show();
     }
+
+
+
 }

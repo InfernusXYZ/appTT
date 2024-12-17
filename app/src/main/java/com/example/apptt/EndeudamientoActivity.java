@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -349,7 +351,9 @@ public class EndeudamientoActivity extends AppCompatActivity {
         });
         // Limpiar las gráficas
         initializeCharts();
-        this.recreate();
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
         Toast.makeText(EndeudamientoActivity.this, "Historial y gráficas borradas", Toast.LENGTH_SHORT).show();
     }
 
@@ -618,7 +622,10 @@ public class EndeudamientoActivity extends AppCompatActivity {
 
         if (deudaRestante <= 0 && !alertamostrada) {
             alertamostrada = true;
-            confirmarReinicioMeta();
+            Toast.makeText(this,"Felicidades las deudas fueron pagadas favor de presionar borrar deuda actual y historial para despedirte de tus deudas",Toast.LENGTH_SHORT).show();
+            /*new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                confirmarReinicioMeta();
+            }, 1000);*/
         }
 
     }

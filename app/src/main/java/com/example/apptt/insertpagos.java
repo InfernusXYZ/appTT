@@ -52,6 +52,7 @@ public class insertpagos extends AppCompatActivity {
     private TextView tvprogreso;
     private double progresoRestante;
     private String tipostr,ingresosStr,pagosStr;
+    private boolean shouldRecreate = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,7 +172,7 @@ public class insertpagos extends AppCompatActivity {
                 }
                 double montoingresado = Double.parseDouble(montopagos);
                 if(montoingresado <= progresoRestante){
-                    guardardeuda();
+                    guardarDeuda();
                 }else{
                     Toast.makeText(getApplicationContext(),"No debes pagar mas de lo que debes",Toast.LENGTH_SHORT).show();
                 }
@@ -212,46 +213,24 @@ public class insertpagos extends AppCompatActivity {
         });
     }
 
-    private void guardardeuda(){
+    private void guardarDeuda() {
         double Ingresomensuales = Double.parseDouble(ingresosStr);
         double Pagomensuales = Double.parseDouble(pagosStr);
         double relacionEndeudamiento = (Pagomensuales / Ingresomensuales) * 100;
 
-        if (Ingresomensuales <= Pagomensuales){
-            Toast.makeText(this,"No puedes pagar mas de lo que ganas", Toast.LENGTH_SHORT).show();
+        if (Ingresomensuales <= Pagomensuales) {
+            Toast.makeText(this, "No puedes pagar más de lo que ganas", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Aquí verificamos si la relación de endeudamiento supera el umbral (30%)
+        // Verificamos si la relación de endeudamiento supera el umbral
         if (relacionEndeudamiento > 30) {
+            shouldRecreate = true; // Indicamos que se debe recrear
             mostrarAlertaExcesoDeuda(relacionEndeudamiento);
+        } else {
+            continuarGuardado();
+            this.recreate();
         }
-
-        //guardar datos en firebase
-        String userID = mAuth.getCurrentUser().getUid();
-        Map<String,Object> DeudaMap = new HashMap<>();
-        DeudaMap.put("Fecha",obtenerfecha());
-        DeudaMap.put("TipoDeuda", tipostr);
-        DeudaMap.put("IngresoMensual",Ingresomensuales);
-        DeudaMap.put("PagoMensual",Pagomensuales);
-        DeudaMap.put("Relaciondeendeudamiento",relacionEndeudamiento);
-
-        etingresos.setText("");
-        etpagos.setText("");
-        spinnerdeudas.setSelection(0);
-
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.child("Deudas").child(userID).push().setValue(DeudaMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()){
-                    Toast.makeText(insertpagos.this,"Ingreso guardado correctamente",Toast.LENGTH_SHORT).show();
-                }else {
-                    Toast.makeText(insertpagos.this,"Error al guardar el ingreso",Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-        guardarGastos();
     }
 
     private String obtenerfecha(){
@@ -263,11 +242,18 @@ public class insertpagos extends AppCompatActivity {
     private void mostrarAlertaExcesoDeuda(double relacionEndeudamiento) {
         new AlertDialog.Builder(this)
                 .setTitle("¡Alerta! Relación de Endeudamiento Alta")
-                .setMessage("Tu relación de endeudamiento es del " + String.format("%.2f", relacionEndeudamiento) + "%, lo cual es mayor al 30%. Esto indica que una gran parte de tus ingresos está siendo utilizada para pagar deudas.\n\n" +
+                .setMessage("Tu relación de endeudamiento es del " + String.format("%.2f", relacionEndeudamiento) +
+                        "%, lo cual es mayor al 30%. Esto indica que una gran parte de tus ingresos está siendo utilizada para pagar deudas.\n\n" +
                         "Para mejorar tu situación financiera, considera reducir tus deudas, aumentar tus ingresos o ajustar tus gastos. Mantener una relación de endeudamiento por debajo del 30% es ideal para asegurar tu estabilidad financiera.")
-                .setPositiveButton("Entendido", null)
+                .setPositiveButton("Entendido", (dialog, which) -> {
+                    continuarGuardado();
+                    if (shouldRecreate) {
+                        recreate(); // Recrear solo si el estado lo requiere
+                    }
+                })
                 .show();
     }
+
 
     private void cargaringresomensual(){
         DatabaseReference databaseReference = FirebaseDatabase.getInstance()
@@ -377,4 +363,32 @@ public class insertpagos extends AppCompatActivity {
             }
         });
     }
+
+    private void continuarGuardado() {
+        String userID = mAuth.getCurrentUser().getUid();
+        Map<String, Object> DeudaMap = new HashMap<>();
+        DeudaMap.put("Fecha", obtenerfecha());
+        DeudaMap.put("TipoDeuda", tipostr);
+        DeudaMap.put("IngresoMensual", Double.parseDouble(ingresosStr));
+        DeudaMap.put("PagoMensual", Double.parseDouble(pagosStr));
+        DeudaMap.put("Relaciondeendeudamiento", (Double.parseDouble(pagosStr) / Double.parseDouble(ingresosStr)) * 100);
+
+        etpagos.setText("");
+        spinnerdeudas.setSelection(0);
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase.child("Deudas").child(userID).push().setValue(DeudaMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(insertpagos.this, "Ingreso guardado correctamente", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(insertpagos.this, "Error al guardar el ingreso", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        guardarGastos();
+    }
+
 }

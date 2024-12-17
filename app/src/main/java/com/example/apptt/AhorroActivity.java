@@ -28,6 +28,7 @@ import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import android.widget.TextView;
@@ -162,8 +163,7 @@ public class AhorroActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(AhorroActivity.this,InsertAhorro.class);
-                startActivity(intent);
-                finish();
+                startActivityForResult(intent, 1);
             }
         });
 
@@ -489,7 +489,7 @@ public class AhorroActivity extends AppCompatActivity {
                 if(!isFinishing()){
                     mostrarmensajeexito();
                 }
-            },300);
+            },600);
 
         }
     }
@@ -674,5 +674,16 @@ public class AhorroActivity extends AppCompatActivity {
         });
     }
 
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1 && resultCode == RESULT_OK) { // Código 1 para la actividad de ahorro
+            // Cargar nuevamente los datos de ahorro
+            cargarMetaAhorro();
+            Toast.makeText(this, "Progreso actualizado tras guardar ahorro", Toast.LENGTH_SHORT).show();
+        }
+    }
 
 }
